@@ -2,87 +2,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title }}</title>
   <link rel="shortcut icon" href="{{ site.favicon }}">
   {%- if jekyll.environment == 'production' -%}
   <link rel="canonical" href="{{ absolute-url-canonical }}" />
   {%- endif -%}
   <base href="{{ site.baseurl }}">
-  <!-- Meta -->
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- For Google -->
   <meta name="description" content="{{ description }}" />
   <meta name="keywords" content="{{ keywords }}" />
   <meta name="author" content="{{ site.owner }}" />
+  <meta name="theme-color" content="#0b0d10" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
 
-  <!-- For Facebook -->
-  <meta property="fb:app_id" content="{{ site.fb-app }}" />
+  <!-- Open Graph (Facebook, LinkedIn, Slack, Discord, ...) -->
   <meta property="og:title" content="{{ title }}" />
   <meta property="og:description" content="{{ description }}" />
+  <meta property="og:url" content="{{ absolute-url }}" />
+  <meta property="og:site_name" content="{{ site.title }}" />
+  <meta property="og:locale" content="{{ site.lang | default: 'en_US' }}" />
   {%- if og-type -%}
   <meta property="og:type" content="{{ og-type }}" />
   {%- else -%}
   <meta property="og:type" content="website" />
   {%- endif -%}
   {%- if og-image -%}
+  {%- assign og-w = post-or-page-or-site.og-image-width | default: site.og-image-width -%}
+  {%- assign og-h = post-or-page-or-site.og-image-height | default: site.og-image-height -%}
   <meta property="og:image" content="{{ og-image }}" />
+  <meta property="og:image:secure_url" content="{{ og-image }}" />
+  <meta property="og:image:alt" content="{{ title }}" />
+  {%- if og-w and og-h -%}
+  <meta property="og:image:width" content="{{ og-w }}" />
+  <meta property="og:image:height" content="{{ og-h }}" />
+  {%- endif -%}
+  {%- endif -%}
+  {%- if site.fb-app -%}
+  <meta property="fb:app_id" content="{{ site.fb-app }}" />
   {%- endif -%}
 
-  <!-- For Twitter -->
+  {%- if og-type == 'article' and post -%}
+  <!-- Article-specific OG tags -->
+  <meta property="article:published_time" content="{{ post.date | date_to_xmlschema }}" />
+  {%- if post.last_modified_at -%}
+  <meta property="article:modified_time" content="{{ post.last_modified_at | date_to_xmlschema }}" />
+  {%- endif -%}
+  <meta property="article:author" content="{{ site.owner }}" />
+  {%- for tag in post.tags -%}
+  <meta property="article:tag" content="{{ tag }}" />
+  {%- endfor -%}
+  {%- endif -%}
+
+  <!-- Twitter Card -->
+  {%- if og-image -%}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="{{ og-image }}" />
+  <meta name="twitter:image:alt" content="{{ title }}" />
+  {%- else -%}
   <meta name="twitter:card" content="summary" />
+  {%- endif -%}
   <meta name="twitter:title" content="{{ title }}" />
   <meta name="twitter:description" content="{{ description }}" />
-  <meta name="twitter:image" content="" />
+  {%- if site.twitter.username -%}
+  <meta name="twitter:site" content="@{{ site.twitter.username }}" />
+  <meta name="twitter:creator" content="@{{ site.twitter.username }}" />
+  {%- endif -%}
+
+  {%- if og-type == 'article' and post -%}
+  <!-- JSON-LD structured data for rich link previews and search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "mainEntityOfPage": { "@type": "WebPage", "@id": {{ absolute-url | jsonify }} },
+    "headline": {{ title | jsonify }},
+    "description": {{ description | jsonify }},
+    {%- if og-image %}
+    "image": {{ og-image | jsonify }},
+    {%- endif %}
+    "datePublished": {{ post.date | date_to_xmlschema | jsonify }},
+    {%- if post.last_modified_at %}
+    "dateModified": {{ post.last_modified_at | date_to_xmlschema | jsonify }},
+    {%- else %}
+    "dateModified": {{ post.date | date_to_xmlschema | jsonify }},
+    {%- endif %}
+    "author": { "@type": "Person", "name": {{ site.owner | jsonify }} },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ site.owner | jsonify }},
+      "logo": { "@type": "ImageObject", "url": {{ site.avatar | absolute_url | jsonify }} }
+    },
+    "keywords": {{ post.tags | join: ', ' | jsonify }}
+  }
+  </script>
+  {%- endif -%}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/assets/css/styles.css?{{ site-time | date: '%s' }}">
+  <link rel="stylesheet" href="/assets/css/pygments/vs.css?{{ site-time | date: '%s' }}">
+
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = stored || (prefersDark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = theme;
+      } catch (e) {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    })();
+  </script>
 
   {%- if jekyll.environment == 'production' -%}
-  <!-- Global site tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.ga }}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag() {
-      dataLayer.push(arguments);
-    }
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', '{{ site.ga }}');
   </script>
   {%- endif -%}
-
-  <!-- facebook -->
-  <div id="fb-root"></div>
-  <script>(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.11&appId={{ site.fb-app }}';
-    fjs.parentNode.insertBefore(js, fjs);
-  }(document, 'script', 'facebook-jssdk'));
-  </script>
-
-  <link href='https://fonts.googleapis.com/css?family=Lato:300,400,300italic,400italic' rel='stylesheet' type='text/css'>
-  <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
-  <link rel="stylesheet" href="/assets/css/styles.css?{{ site-time | date: '%s' }}">
-  <link rel="stylesheet" href="/assets/css/pygments/vs.css">
 </head>
 
 <body>
   {%- include _header.html -%}
-  <div class="container sections-wrapper">
-    <div class="row">
-      <div class="primary col-md-8 col-sm-12 col-xs-12">
-        {{ content }}
+  <main class="main">
+    <div class="container">
+      <div class="layout">
+        <div class="layout__primary">
+          {{ content }}
+        </div>
+        {%- include _rightColumn.html -%}
       </div>
-      {%- include _rightColumn.html -%}
     </div>
-  </div>
+  </main>
   {%- include _footer.html -%}
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
-  <script type="text/javascript" src="/assets/js/main.js?{{ site-time | date: '%s' }}"></script>
+  <script src="/assets/js/main.js?{{ site-time | date: '%s' }}" defer></script>
 </body>
-
 </html>

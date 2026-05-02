@@ -1,9 +1,8 @@
 ---
 layout: default
 ---
-<div>
+<div class="post-list">
   {%- assign page-date = page.date | prepend: '/' -%}
-
   {%- for post in site.posts -%}
   {%- assign post-date = post.date | date: '/%Y/%m/%d' -%}
   {%- if post-date contains page-date -%}

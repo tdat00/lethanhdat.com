@@ -4,3 +4,6 @@ github: github
 free: free
 funny: funny
 dota2: dota2
+distributed-tracing: distributed-tracing
+opentelemetry: opentelemetry
+microsoft-365: microsoft-365

@@ -1,112 +1,67 @@
-<div class="secondary col-md-4 col-sm-12 col-xs-12">
-  <aside class="recent-posts list aside section">
-    <div class="section-inner">
-      <h2 class="heading">Recent Posts</h2>
-      <div class="content">
-        {%- for post in site.posts limit:5 -%}
-        <div class="item">
-          <h4 class="title"><a class="inherit-color" href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a></h4>
-          {%- if post.description != null and post.description != blank -%}
-          <p>{{ post.description }}</p>
-          {%- else -%}
-          <p>{{ post.excerpt | strip_html }}</p>
-          {%- endif -%}
-        </div>
-        {%- endfor -%}
+{%- include _assign -%}
+<aside class="layout__secondary">
+  <div class="sidebar-card profile-card">
+    <div class="profile-card__top">
+      <img class="profile-card__avatar" src="/assets/images/avatar.png" alt="{{ site.owner }}" />
+      <div>
+        <div class="profile-card__name">{{ site.owner }}</div>
+        <div class="profile-card__title">a boy who code</div>
       </div>
     </div>
-  </aside>
-  <aside class="list aside section">
-    <div class="section-inner">
-      <h2 class="heading">
-        Categories
-      </h2>
-      <div class="content">
-        <ul class="list-unstyled">
-          {%- for c in site.data.categories -%}
-          <li><i class="fa fa-anchor"></i> <a href="/{{ c[0] }}">{{ c[0] }}</a></li>
-          {%- endfor -%}
-        </ul>
-      </div>
+    <div class="profile-card__social">
+      <a href="mailto:{{ site.email }}" aria-label="Email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </a>
+      <a href="https://github.com/tdat00" target="_blank" rel="noopener" aria-label="GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.02 1.75 2.68 1.24 3.34.95.1-.74.4-1.24.72-1.53-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11.05 11.05 0 0 1 5.79 0c2.21-1.49 3.18-1.18 3.18-1.18.62 1.59.23 2.76.11 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.26 5.69.41.36.78 1.07.78 2.16 0 1.56-.01 2.81-.01 3.19 0 .31.21.67.8.55C20.22 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+      </a>
     </div>
-  </aside>
-  <aside class="aside section">
-    <div class="section-inner">
-      <h2 class="heading">
-        <a href="/tag">All tags</a>
-      </h2>
-      <div class="content">
-        {%- for t in site.data.tags -%}
-        <a href="/tag/{{ t[0] }}" class="tag">{{ t[1] }}</a>
-        {%- endfor -%}
+  </div>
+
+  {%- if site.posts.size > 1 -%}
+  <div class="sidebar-card">
+    <h3 class="sidebar-card__title">Recent posts</h3>
+    <div class="recent-list">
+      {%- for post in site.posts limit:5 -%}
+      <div class="recent-list__item">
+        <h4 class="recent-list__title"><a href="{{ post.url }}">{{ post.title }}</a></h4>
+        {%- if post.description and post.description != blank -%}
+        <p class="recent-list__excerpt">{{ post.description }}</p>
+        {%- else -%}
+        <p class="recent-list__excerpt">{{ post.excerpt | strip_html | truncate: 90 }}</p>
+        {%- endif -%}
       </div>
+      {%- endfor -%}
     </div>
-  </aside>
-  <aside class="profile aside section">
-    <div class="section-inner">
-      <h2 class="heading">About me
-        <p>I am a lazy developer</p>
-      </h2>
-      <div class="content">
-        <div class="row">
-          <div class="col-xs-5">
-            <img class="profile-image img-responsive" src="/assets/images/avatar.png" alt="{{ site.owner[0].name }}"
-            />
-          </div>
-          <div class="col-xs-7 profile-content">
-            <div class="name">Dat Le</div>
-            <div class="title">Bug Maker</div>
-            <ul class="social list-inline">
-              <li>
-                <a href="mailto:lethanhdat.com">
-                  <i class="fa fa-envelope"></i>
-                </a>
-              </li>
-              <li>
-                <a href="skype:dat.lethanh">
-                  <i class="fa fa-skype"></i>
-                </a>
-              </li>
-              <li>
-                <a href="https://github.com/tdat00" target="_blank">
-                  <i class="fa fa-github-alt"></i>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  </div>
+  {%- endif -%}
+
+  {%- if site.data.tags and site.data.tags.size > 0 -%}
+  <div class="sidebar-card">
+    <h3 class="sidebar-card__title"><a class="inherit-color" href="/tag/">All tags</a></h3>
+    <div class="tag-cloud">
+      {%- for t in site.data.tags -%}
+      <a href="/tag/{{ t[0] }}" class="tag">{{ t[1] }}</a>
+      {%- endfor -%}
     </div>
-  </aside>
-  <aside class="list aside section">
-    <div class="section-inner">
-      <h2 class="heading">Links</h2>
-      <div class="content">
-        <ul class="list-unstyled">
-          <li>
-            <a class="no-hover" href="https://github.com/LeeVox/sdk" target="_blank">
-              <i class="fa fa-external-link"></i> SDK for C#</a>
-          </li>
-          <li>
-            <a class="no-hover" href="https://regextester.github.io" target="_blank">
-              <i class="fa fa-external-link"></i> Regular Expression Tester Online</a>
-          </li>
-          <li>
-            <a class="no-hover" href="https://leevox.com" target="_blank">
-              <i class="fa fa-external-link"></i> LeeVox</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </aside>
-  <aside class="list aside section">
-    <div class="section-inner">
-      <h2 class="heading">Credit</h2>
-      <div class="content">
-        Free website template by
-        <a href="https://themes.3rdwavemedia.com/website-templates/free-responsive-website-template-for-developers/"
-          target="_blank">Xiaoying Riley</a>
-      </div>
-    </div>
-  </aside>
-</div>
+  </div>
+  {%- endif -%}
+
+  <div class="sidebar-card">
+    <h3 class="sidebar-card__title">Links</h3>
+    <ul class="sidebar-list">
+      <li><a href="https://github.com/LeeVox/sdk" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        SDK for C#
+      </a></li>
+      <li><a href="https://regextester.github.io" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Regex Tester
+      </a></li>
+      <li><a href="https://leevox.com" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        LeeVox
+      </a></li>
+    </ul>
+  </div>
+</aside>

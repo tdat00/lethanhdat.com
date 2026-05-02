@@ -1,9 +1,8 @@
 ---
 layout: default
 ---
-<div>
+<div class="post-list">
   {%- assign page-categories = page.category | split: ' ' | join: '/' -%}
-
   {%- for post in site.posts -%}
   {%- assign post-categories = post.categories | join: '/' -%}
   {%- if post-categories contains page-categories -%}

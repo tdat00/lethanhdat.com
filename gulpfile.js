@@ -2,26 +2,47 @@ var gulp = require('gulp');
 var del = require('del');
 var gutil = require('gulp-util');
 var spawn = require('child_process').spawn;
+var spawnSync = require('child_process').spawnSync;
 var fs = require('fs');
 var path = require('path');
 var argv = require('yargs').argv;
 var buildDrafts = argv && (argv.draft !== undefined || argv.drafts !== undefined );
+var isWindows = process.platform === 'win32';
 
 var run = function (command, cb) {
-  var child = spawn('cmd', ['/c', command]);
-  child.stdout.setEncoding('utf8');
-  child.stdout.on('data', function (data) {
-    gutil.log(data.trim());
-  });
+  var child = isWindows
+    ? spawn('cmd', ['/c', command], { stdio: 'inherit' })
+    : spawn('sh', ['-c', command], { stdio: 'inherit' });
 
-  child.stderr.setEncoding('utf8');
-  child.stderr.on('data', function (data) {
-    gutil.log(gutil.colors.red(data));
+  child.on('error', function (err) {
+    cb && cb(err);
   });
-
   child.on('close', function (code) {
-    cb && cb(code);
+    if (code !== 0) {
+      cb && cb(new Error("Command '" + command + "' exited with code " + code));
+    } else {
+      cb && cb();
+    }
   });
+};
+
+var hasCommand = function (cmd) {
+  var probe = isWindows
+    ? spawnSync('cmd', ['/c', 'where ' + cmd])
+    : spawnSync('sh', ['-c', 'command -v ' + cmd]);
+  return probe.status === 0;
+};
+
+var requireRuby = function (cb) {
+  if (!hasCommand('ruby')) {
+    return cb(new Error(
+      "Ruby is not installed or not on PATH. Install Ruby+Devkit (https://rubyinstaller.org/ on Windows, or `brew install ruby` on macOS) and reopen the shell, then re-run this task."
+    ));
+  }
+  if (!hasCommand('gem')) {
+    return cb(new Error("'gem' was not found on PATH even though Ruby seems present. Reinstall RubyGems."));
+  }
+  cb();
 };
 
 var getAllDates = function () {
@@ -124,14 +145,22 @@ var writeFile = function (relativePath, content) {
   fs.writeFileSync(path.resolve(relativePath), content);
 };
 
-gulp.task('serve', function (cb) {
-  run('bundle exec jekyll serve --watch --incremental --drafts');
-});
+var serveTask = function (command) {
+  return function (cb) {
+    requireRuby(function (err) {
+      if (err) return cb(err);
+      if (!hasCommand('bundle')) {
+        return cb(new Error("Bundler is not installed. Run `gulp install` (or `gem install bundler && bundle install`) first."));
+      }
+      run(command, cb);
+    });
+  };
+};
+
+gulp.task('serve', serveTask('bundle exec jekyll serve --watch --incremental --drafts'));
 gulp.task('server', gulp.series('serve'));
 
-gulp.task('serve-prod', function (cb) {
-  run('bundle exec jekyll serve');
-});
+gulp.task('serve-prod', serveTask('bundle exec jekyll serve'));
 gulp.task('server-prod', gulp.series('serve-prod'));
 
 gulp.task('build-dates', function (cb) {
@@ -210,7 +239,14 @@ gulp.task('clean', gulp.series('clean-sites', 'clean-dates', 'clean-tags', 'clea
 gulp.task('build', gulp.series('clean', 'build-dates', 'build-tags', 'build-categories'));
 
 gulp.task('install-bundler', function (cb) {
-  run('gem install bundler', cb);
+  requireRuby(function (err) {
+    if (err) return cb(err);
+    if (hasCommand('bundle')) {
+      gutil.log('Bundler already installed; skipping `gem install bundler`.');
+      return cb();
+    }
+    run('gem install bundler', cb);
+  });
 });
 
 gulp.task('install', gulp.series('install-bundler', function (cb) {

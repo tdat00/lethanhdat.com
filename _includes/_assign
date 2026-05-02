@@ -126,7 +126,11 @@
   {%- assign og-type = layout.og-type -%}
 {%- endif -%}
 
-{%- assign og-image = post-or-page-or-site.og-image | absolute_url -%}
+{%- if post-or-page-or-site.og-image -%}
+  {%- assign og-image = post-or-page-or-site.og-image | absolute_url -%}
+{%- elsif site.og-image -%}
+  {%- assign og-image = site.og-image | absolute_url -%}
+{%- endif -%}
 
 {%- if jekyll.environment == 'production' -%}
   {%- assign url-canonical = url -%}
@@ -134,5 +138,7 @@
   {%- assign absolute-url-canonical = absolute-url -%}
   {%- assign absolute-url = absolute-url | replace: 'http://', 'https://' -%}
 
-  {%- assign og-image = og-image | replace: 'http://', 'https://' -%}
+  {%- if og-image -%}
+    {%- assign og-image = og-image | replace: 'http://', 'https://' -%}
+  {%- endif -%}
 {%- endif -%}
