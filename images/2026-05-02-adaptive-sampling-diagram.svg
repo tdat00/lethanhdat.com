@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Adaptive sampler control loop: Active Monitoring writes results to MDM; the AdaptiveSamplerWorker reads MDM every 5 minutes; the Config System pushes new sampling ratios back to the Active Monitoring fleet, closing the loop.">
+  <style>
+    .box       { fill: #ffffff; stroke: #2b2b2b; stroke-width: 1.5; }
+    .box-accent{ fill: #eef5ff; stroke: #1f6feb; stroke-width: 1.8; }
+    .title     { font-size: 16px; font-weight: 600; fill: #1a1a1a; }
+    .subtitle  { font-size: 12px; fill: #555; }
+    .bullet    { font-size: 13px; fill: #333; }
+    .label     { font-size: 12px; fill: #444; font-style: italic; }
+    .arrow     { stroke: #555; stroke-width: 1.6; fill: none; }
+    @media (prefers-color-scheme: dark) {
+      .box       { fill: #1c1c1c; stroke: #cfcfcf; }
+      .box-accent{ fill: #16243b; stroke: #6ea8ff; }
+      .title     { fill: #ececec; }
+      .subtitle  { fill: #b0b0b0; }
+      .bullet    { fill: #d6d6d6; }
+      .label     { fill: #c4c4c4; }
+      .arrow     { stroke: #b0b0b0; }
+    }
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#888"/>
+    </marker>
+  </defs>
+
+  <!-- 1. Active Monitoring -->
+  <rect class="box" x="240" y="20" width="240" height="68" rx="8"/>
+  <text class="title"    x="360" y="58" text-anchor="middle">Active Monitoring</text>
+
+  <!-- arrow 1: AM -> MDM -->
+  <path class="arrow" d="M360,88 L360,138" marker-end="url(#ah)"/>
+  <text class="label" x="370" y="118">save request results</text>
+
+  <!-- 2. MDM -->
+  <rect class="box" x="260" y="138" width="200" height="68" rx="8"/>
+  <text class="title"    x="360" y="167" text-anchor="middle">MDM</text>
+  <text class="subtitle" x="360" y="188" text-anchor="middle">metrics store</text>
+
+  <!-- arrow 2: MDM -> Worker -->
+  <path class="arrow" d="M360,206 L360,256" marker-end="url(#ah)"/>
+  <text class="label" x="370" y="236">read request results</text>
+
+  <!-- 3. AdaptiveSamplerWorker -->
+  <rect class="box-accent" x="210" y="256" width="300" height="120" rx="8"/>
+  <text class="title"  x="360" y="284" text-anchor="middle">AdaptiveSamplerWorker</text>
+  <text class="bullet" x="234" y="312">• every 5 minutes</text>
+  <text class="bullet" x="234" y="334">• find hot servers</text>
+  <text class="bullet" x="234" y="356">• compute new ratios</text>
+
+  <!-- arrow 3: Worker -> Config -->
+  <path class="arrow" d="M360,376 L360,426" marker-end="url(#ah)"/>
+  <text class="label" x="370" y="406">adjust sampling ratio</text>
+
+  <!-- 4. Config System -->
+  <rect class="box" x="260" y="426" width="200" height="58" rx="8"/>
+  <text class="title" x="360" y="461" text-anchor="middle">Config System</text>
+
+  <!-- arrow 4: Config -> back to Active Monitoring (loop) -->
+  <path class="arrow" d="M460,455 L630,455 L630,54 L480,54" marker-end="url(#ah)"/>
+  <text class="label" x="640" y="255" text-anchor="middle" transform="rotate(-90 640 255)">push new sampling ratios</text>
+</svg>
