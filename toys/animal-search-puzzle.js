@@ -7,40 +7,43 @@
   const faces = window.AnimalFaces;
   const animals = new Map(faces.map((face) => [face.code, face]));
   const languageStorageKey = 'word-search-language';
+  const settingsStorageKey = 'animal-search-settings-open';
   const translations = {
     vi: {
       title: 'Mê cung con vật', brand: 'mê cung con vật', tagline: 'CHƠI · HỌC · KHÁM PHÁ', language: 'Ngôn ngữ',
       gamesMenu: 'Chọn trò chơi', gamesTitle: 'Trò chơi', gameWords: 'Tìm chữ', gameNumbers: 'Tìm số', gameAnimals: 'Tìm con vật',
       settingsTitle: 'Thiết kế thử thách', rows: 'Số hàng', cols: 'Số cột', targetCount: 'Số đáp án', directions: 'Hướng tìm',
-      maxLength: 'Kích thước nhóm (tối đa)', imageStyle: 'Hình ảnh', color: 'Có màu', monochrome: 'Trắng đen', minimal: 'Tối giản',
-      horizontal: 'Ngang', vertical: 'Dọc', diagonal: 'Chéo', reverse: 'Ngược', apply: 'Tạo bảng', generate: 'Bảng mới', print: 'In A4',
+      minLength: 'Kích thước nhóm tối thiểu', maxLength: 'Kích thước nhóm tối đa', imageStyle: 'Hình ảnh', color: 'Có màu', monochrome: 'Trắng đen', minimal: 'Tối giản',
+      horizontal: 'Ngang', vertical: 'Dọc', diagonal: 'Chéo', reverse: 'Ngược', generate: 'Tạo Bảng Mới', print: 'In A4', printText: 'In',
       panelTitle: 'Tìm bạn nhỏ', targetsTitle: 'Các nhóm bạn', progress: 'Tiến độ', cancel: 'Bỏ chọn', complete: 'Tìm thấy hết rồi!',
       footer: 'Một chút tập trung, một niềm vui nhỏ.', perSequence: 'con vật / đáp án',
-      errorSize: 'Số hàng và cột phải là số nguyên từ 5 đến 12.', errorCount: 'Chọn từ 3 đến 8 đáp án.',
-      errorMaxLength: 'Kích thước nhóm phải là số nguyên từ 2 đến 7.',
+      errorSize: 'Số hàng và cột phải là số nguyên từ 5 đến 16.', errorCount: 'Số đáp án phải là số nguyên từ 6 đến 16.',
+      errorLength: 'Kích thước nhóm tối thiểu và tối đa phải là số nguyên từ 2 đến 8.',
+      errorLengthRange: 'Kích thước nhóm tối thiểu không được lớn hơn tối đa.',
       errorDirections: 'Chọn ít nhất một hướng ngang, dọc hoặc chéo.', errorPlacement: 'Chưa xếp đủ đáp án. Hãy tăng kích thước hoặc thử lại.',
       errorUnexpected: 'Chưa thể tạo bảng. Vui lòng thử lại.', ready: 'Bảng con vật đã sẵn sàng.', anchor: 'Đã chọn ô đầu, hãy chọn ô cuối.',
-      invalid: 'Hãy chọn một đường thẳng.', noMatch: 'Chưa đúng chuỗi con vật. Thử lại nhé!', found: 'Đã tìm thấy một nhóm bạn!',
+      invalid: 'Hãy chọn một đường thẳng theo hướng đã bật cho bảng này.', noMatch: 'Chưa khớp chuỗi con vật theo hướng đã bật. Thử lại nhé!', found: 'Đã tìm thấy một nhóm bạn!',
       alreadyFound: 'Nhóm bạn này đã được tìm thấy.', cleared: 'Đã bỏ chọn.', selected: 'Đang chọn: {animals}',
       cellLabel: 'Hàng {row}, cột {col}: {animal}', targetLabel: 'Nhóm {index}: {animals}', foundLabel: 'Đã tìm thấy. {animals}',
-      description: 'Trò chơi tìm chuỗi con vật bằng hình ảnh cho trẻ chưa biết chữ. 22 mặt thú hoạt hình, đáp án ngẫu nhiên từ 2 đến 7 hình và in giấy A4.'
+      description: 'Trò chơi tìm chuỗi con vật bằng hình ảnh cho trẻ chưa biết chữ. 22 mặt thú hoạt hình, đáp án ngẫu nhiên từ 2 đến 8 hình và in giấy A4.'
     },
     en: {
       title: 'Animal Maze - Picture Search', brand: 'animal maze', tagline: 'PLAY · LEARN · EXPLORE', language: 'Language',
       gamesMenu: 'Choose a game', gamesTitle: 'Games', gameWords: 'Word search', gameNumbers: 'Number search', gameAnimals: 'Animal search',
       settingsTitle: 'Design your challenge', rows: 'Rows', cols: 'Columns', targetCount: 'Sequences', directions: 'Directions',
-      maxLength: 'Group size (maximum)', imageStyle: 'Images', color: 'Color', monochrome: 'Black & white', minimal: 'Minimal',
-      horizontal: 'Across', vertical: 'Down', diagonal: 'Diagonal', reverse: 'Reverse', apply: 'Create puzzle', generate: 'New puzzle', print: 'Print A4',
+      minLength: 'Minimum group size', maxLength: 'Maximum group size', imageStyle: 'Images', color: 'Color', monochrome: 'Black & white', minimal: 'Minimal',
+      horizontal: 'Across', vertical: 'Down', diagonal: 'Diagonal', reverse: 'Reverse', generate: 'Create New Puzzle', print: 'Print A4', printText: 'Print',
       panelTitle: 'Find little friends', targetsTitle: 'Groups to find', progress: 'Progress', cancel: 'Clear selection', complete: 'You found them all!',
       footer: 'A little focus, a little joy.', perSequence: 'animals / sequence',
-      errorSize: 'Rows and columns must be whole numbers from 5 to 12.', errorCount: 'Choose 3 to 8 sequences.',
-      errorMaxLength: 'Maximum group size must be a whole number from 2 to 7.',
+      errorSize: 'Rows and columns must be whole numbers from 5 to 16.', errorCount: 'The sequence count must be a whole number from 6 to 16.',
+      errorLength: 'Minimum and maximum group sizes must be whole numbers from 2 to 8.',
+      errorLengthRange: 'Minimum group size must not exceed the maximum.',
       errorDirections: 'Choose at least one direction: across, down or diagonal.', errorPlacement: 'Not every sequence could fit. Increase the grid size or try again.',
       errorUnexpected: 'Could not create the puzzle. Please try again.', ready: 'Your animal puzzle is ready.', anchor: 'First cell selected. Choose the last cell.',
-      invalid: 'Choose a straight line.', noMatch: 'That sequence does not match. Try again!', found: 'You found a group of friends!',
+      invalid: 'Choose a straight line in a direction enabled for this puzzle.', noMatch: 'That sequence does not match in an enabled direction. Try again!', found: 'You found a group of friends!',
       alreadyFound: 'You already found this group.', cleared: 'Selection cleared.', selected: 'Selecting: {animals}',
       cellLabel: 'Row {row}, column {col}: {animal}', targetLabel: 'Group {index}: {animals}', foundLabel: 'Found. {animals}',
-      description: 'A picture search game for children who cannot read yet. Find random sequences of 2 to 7 cartoon animal faces, play offline and print on A4 paper.'
+      description: 'A picture search game for children who cannot read yet. Find random sequences of 2 to 8 cartoon animal faces, play offline and print on A4 paper.'
     }
   };
   let language = 'vi';
@@ -121,9 +124,8 @@
     getElement('form-error').textContent = translate(key);
     getElement('form-error').hidden = false;
     if (element) {
-      getElement('settings').open = true;
       element.setAttribute('aria-invalid', 'true');
-      element.focus();
+      if (getElement('settings').open) element.focus();
     }
   }
 
@@ -149,27 +151,31 @@
     const rows = getElement('rows').valueAsNumber;
     const cols = getElement('cols').valueAsNumber;
     for (const [id, value] of [['rows', rows], ['cols', cols]]) {
-      if (!Number.isInteger(value) || value < 5 || value > 12) { showError('errorSize', getElement(id)); return null; }
+      if (!Number.isInteger(value) || value < 5 || value > 16) { showError('errorSize', getElement(id)); return null; }
     }
     const count = getElement('target-count').valueAsNumber;
-    if (!Number.isInteger(count) || count < 3 || count > 8) { showError('errorCount', getElement('target-count')); return null; }
+    if (!Number.isInteger(count) || count < 6 || count > 16) { showError('errorCount', getElement('target-count')); return null; }
+    const minLength = getElement('min-length').valueAsNumber;
     const maxLength = getElement('max-length').valueAsNumber;
-    if (!Number.isInteger(maxLength) || maxLength < 2 || maxLength > 7) { showError('errorMaxLength', getElement('max-length')); return null; }
+    for (const [id, value] of [['min-length', minLength], ['max-length', maxLength]]) {
+      if (!Number.isInteger(value) || value < 2 || value > 8) { showError('errorLength', getElement(id)); return null; }
+    }
+    if (minLength > maxLength) { showError('errorLengthRange', getElement('min-length')); return null; }
     const modes = [...form.querySelectorAll('input[name="mode"]:checked')].map((input) => input.value);
     const directions = getDirections(modes);
     if (!directions.length) { showError('errorDirections', form.querySelector('input[name="mode"]')); return null; }
     const alphabet = shuffle(faces.map((face) => face.code)).slice(0, 8).join('');
-    const lengthCount = maxLength - 1;
+    const lengthCount = maxLength - minLength + 1;
     const offset = Math.floor(Math.random() * lengthCount);
-    const lengths = shuffle(Array.from({ length: count }, (_, index) => 2 + (index + offset) % lengthCount));
-    return { rows, cols, modes, directions, alphabet, lengths, maxLength };
+    const lengths = shuffle(Array.from({ length: count }, (_, index) => minLength + (index + offset) % lengthCount));
+    return { rows, cols, modes, directions, alphabet, lengths, minLength, maxLength };
   }
 
   function createPuzzle(settings) {
-    const { rows, cols, directions, alphabet, lengths, maxLength } = settings;
+    const { rows, cols, directions, alphabet, lengths, minLength, maxLength } = settings;
     const board = Array.from({ length: rows }, () => Array.from({ length: cols }, () => alphabet[Math.floor(Math.random() * alphabet.length)]));
     const candidatesByLength = new Map();
-    for (let length = 2; length <= maxLength; length++) {
+    for (let length = minLength; length <= maxLength; length++) {
       const candidates = new Map();
       for (const [dr, dc] of directions) {
         for (let row = 0; row < rows; row++) {
@@ -213,7 +219,7 @@
     }
     game.words.forEach((word, index) => targets.get(word).setAttribute('aria-label', translate(game.found.has(word) ? 'foundLabel' : 'targetLabel', { index: index + 1, animals: sequenceNames(word) })));
     getElement('puzzle-meta').textContent = `${game.rows} × ${game.cols}`;
-    getElement('sequence-length-range').textContent = game.maxLength === 2 ? '2' : `2–${game.maxLength}`;
+    getElement('sequence-length-range').textContent = game.minLength === game.maxLength ? String(game.minLength) : `${game.minLength}–${game.maxLength}`;
     getElement('found-count').textContent = `${game.found.size} / ${game.words.length}`;
     getElement('game-progress').max = game.words.length;
     getElement('game-progress').value = game.found.size;
@@ -235,6 +241,7 @@
     targets = new Map();
     gridElement.style.setProperty('--cols', game.cols);
     gridElement.style.setProperty('--print-cell', `${Math.min(170 / game.cols, 170 / game.rows).toFixed(3)}mm`);
+    getElement('target-list').style.setProperty('--print-target-columns', game.words.length > 8 ? 3 : 2);
     gridElement.setAttribute('aria-rowcount', game.rows);
     gridElement.setAttribute('aria-colcount', game.cols);
     for (let row = 0; row < game.rows; row++) {
@@ -282,23 +289,26 @@
     const settings = readSettings();
     if (!settings) return;
     clearSelection(); generating = true;
-    const buttons = [getElement('generate-button'), form.querySelector('button[type="submit"]')];
-    buttons.forEach((button) => { button.disabled = true; });
+    const generateButton = getElement('generate-button');
+    generateButton.disabled = true;
     form.setAttribute('aria-busy', 'true');
     try {
       await new Promise((resolve) => setTimeout(resolve, 35));
       const nextGame = createPuzzle(settings);
       if (!nextGame) { showError('errorPlacement'); return; }
-      game = nextGame; renderPuzzle(); getElement('settings').open = false;
+      game = nextGame; renderPuzzle();
     } catch (error) { console.error('Animal puzzle generation failed:', error); showError('errorUnexpected'); }
-    finally { generating = false; buttons.forEach((button) => { button.disabled = false; }); form.removeAttribute('aria-busy'); }
+    finally { generating = false; generateButton.disabled = false; form.removeAttribute('aria-busy'); }
   }
 
-  function pathBetween(start, end) {
+  function pathBetween(start, end, directions) {
     if (!start || !end) return [];
     const deltaRow = end[0] - start[0];
     const deltaCol = end[1] - start[1];
     if (deltaRow !== 0 && deltaCol !== 0 && Math.abs(deltaRow) !== Math.abs(deltaCol)) return [];
+    if (directions && (deltaRow !== 0 || deltaCol !== 0) && !directions.some(([rowStep, colStep]) =>
+      (rowStep === Math.sign(deltaRow) && colStep === Math.sign(deltaCol)) ||
+      (rowStep === -Math.sign(deltaRow) && colStep === -Math.sign(deltaCol)))) return [];
     const length = Math.max(Math.abs(deltaRow), Math.abs(deltaCol)) + 1;
     return Array.from({ length }, (_, offset) => [start[0] + offset * Math.sign(deltaRow), start[1] + offset * Math.sign(deltaCol)]);
   }
@@ -319,23 +329,28 @@
 
   function updateSelection(end) {
     removePreview();
-    const path = pathBetween(selectionStart, end);
+    const path = pathBetween(selectionStart, end, game.directions);
     selectedPath = path.length ? path : [selectionStart];
     for (const [row, col] of selectedPath) { cells[row][col].classList.add('is-selected'); cells[row][col].setAttribute('aria-selected', 'true'); }
     cells[selectionStart[0]][selectionStart[1]].classList.add('selection-start');
-    getElement('selection-preview').replaceChildren(...selectedPath.slice(0, 7).map(([row, col]) => imageFor(game.board[row][col])));
+    getElement('selection-preview').replaceChildren(...selectedPath.slice(0, 8).map(([row, col]) => imageFor(game.board[row][col])));
     getElement('cancel-selection').disabled = false;
     setStatus(path.length ? 'selected' : 'invalid', path.length ? '' : 'warning', { animals: sequenceNames(selectedPath.map(([row, col]) => game.board[row][col]).join('')) });
   }
 
   function finishSelection(end) {
-    const path = pathBetween(selectionStart, end);
+    const path = pathBetween(selectionStart, end, game.directions);
+    if (!path.length) { clearSelection(); setStatus('invalid', 'warning'); return; }
     const selected = path.map(([row, col]) => game.board[row][col]).join('');
     const reversed = [...selected].reverse().join('');
-    const matches = game.words.filter((word) => word === selected || word === reversed);
+    const rowStep = Math.sign(end[0] - selectionStart[0]);
+    const colStep = Math.sign(end[1] - selectionStart[1]);
+    const forwardAllowed = path.length === 1 || game.directions.some(([dr, dc]) => dr === rowStep && dc === colStep);
+    const backwardAllowed = path.length === 1 || game.directions.some(([dr, dc]) => dr === -rowStep && dc === -colStep);
+    const matches = game.words.filter((word) =>
+      (forwardAllowed && word === selected) || (backwardAllowed && word === reversed));
     const newMatches = matches.filter((word) => !game.found.has(word));
     clearSelection();
-    if (!path.length) { setStatus('invalid', 'warning'); return; }
     if (!matches.length) { setStatus('noMatch', 'warning'); return; }
     if (!newMatches.length) { setStatus('alreadyFound'); return; }
     for (const word of newMatches) { game.found.add(word); targets.get(word).classList.add('found'); targets.get(word).setAttribute('aria-pressed', 'false'); }
@@ -426,6 +441,14 @@
     try { localStorage.setItem(languageStorageKey, language); } catch {}
     const url = new URL(location.href); url.searchParams.set('lang', language);
     try { history.replaceState(null, '', url); } catch {}
+  });
+  const settingsPanel = getElement('settings');
+  try {
+    const savedOpen = localStorage.getItem(settingsStorageKey);
+    if (savedOpen !== null) settingsPanel.open = savedOpen === 'true';
+  } catch {}
+  settingsPanel.addEventListener('toggle', () => {
+    try { localStorage.setItem(settingsStorageKey, String(settingsPanel.open)); } catch {}
   });
   form.addEventListener('submit', generate);
   form.addEventListener('change', (event) => {

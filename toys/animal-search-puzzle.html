@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#16745b">
-  <meta name="description" content="Trò chơi tìm chuỗi con vật bằng hình ảnh cho trẻ chưa biết chữ. 22 mặt thú hoạt hình, đáp án ngẫu nhiên từ 2 đến 7 hình và in giấy A4.">
+  <meta name="description" content="Trò chơi tìm chuỗi con vật bằng hình ảnh cho trẻ chưa biết chữ. 22 mặt thú hoạt hình, đáp án ngẫu nhiên từ 2 đến 8 hình và in giấy A4.">
   <title>Mê cung con vật</title>
   <link rel="canonical" href="https://lethanhdat.com/toys/animal-search-puzzle.html">
   <link rel="stylesheet" href="animal-search-puzzle.css">
@@ -40,9 +40,9 @@
       <details class="settings" id="settings">
         <summary data-i18n="settingsTitle">Thiết kế thử thách</summary>
         <form id="settings-form" novalidate>
-          <div class="size-fields"><label for="rows"><span data-i18n="rows">Số hàng</span><input id="rows" type="number" value="8" min="5" max="12" step="1" required></label><label for="cols"><span data-i18n="cols">Số cột</span><input id="cols" type="number" value="8" min="5" max="12" step="1" required></label></div>
-          <label for="target-count"><span data-i18n="targetCount">Số đáp án</span><input id="target-count" type="number" value="6" min="3" max="8" step="1" required></label>
-          <label for="max-length"><span data-i18n="maxLength">Kích thước nhóm (tối đa)</span><input id="max-length" type="number" value="7" min="2" max="7" step="1" required></label>
+          <div class="size-fields"><label for="rows"><span data-i18n="rows">Số hàng</span><input id="rows" type="number" value="8" min="5" max="16" step="1" required></label><label for="cols"><span data-i18n="cols">Số cột</span><input id="cols" type="number" value="8" min="5" max="16" step="1" required></label></div>
+          <label for="target-count"><span data-i18n="targetCount">Số đáp án</span><input id="target-count" type="number" value="8" min="6" max="16" step="1" required></label>
+          <div class="size-fields length-fields"><label for="min-length"><span data-i18n="minLength">Kích thước nhóm tối thiểu</span><input id="min-length" type="number" value="3" min="2" max="8" step="1" required></label><label for="max-length"><span data-i18n="maxLength">Kích thước nhóm tối đa</span><input id="max-length" type="number" value="6" min="2" max="8" step="1" required></label></div>
           <fieldset class="image-style"><legend data-i18n="imageStyle">Hình ảnh</legend><div class="mode-grid">
             <label class="mode"><input type="radio" name="image-style" value="color" checked><span class="color-swatch" aria-hidden="true"></span><span data-i18n="color">Có màu</span></label>
             <label class="mode"><input type="radio" name="image-style" value="monochrome"><span class="color-swatch monochrome" aria-hidden="true"></span><span data-i18n="monochrome">Trắng đen</span></label>
@@ -54,14 +54,13 @@
             <label class="mode"><input type="checkbox" name="mode" value="diagonal"><span data-i18n="diagonal">Chéo</span><span class="direction" aria-hidden="true">↘</span></label>
             <label class="mode"><input type="checkbox" name="mode" value="reverse"><span data-i18n="reverse">Ngược</span><span class="direction" aria-hidden="true">↔</span></label>
           </div></fieldset>
-          <button class="button primary" type="submit"><svg class="icon" aria-hidden="true"><use href="#icon-spark"/></svg><span data-i18n="apply">Tạo bảng</span></button>
         </form>
       </details>
       <p id="form-error" role="alert" hidden></p>
       <section class="puzzle-panel" aria-labelledby="panel-title">
         <div class="panel-toolbar"><div class="panel-heading"><h2 id="panel-title" data-i18n="panelTitle">Tìm bạn nhỏ</h2><span id="puzzle-meta"></span></div><div class="actions">
-          <button id="generate-button" type="submit" form="settings-form" class="button primary" data-i18n-title="generate" title="Bảng mới"><svg class="icon" aria-hidden="true"><use href="#icon-spark"/></svg><span data-i18n="generate">Bảng mới</span></button>
-          <button id="print-button" type="button" class="button icon-button" disabled data-i18n-title="print" data-i18n-aria-label="print" title="In A4" aria-label="In A4"><svg class="icon" aria-hidden="true"><use href="#icon-print"/></svg></button>
+          <button id="generate-button" type="submit" form="settings-form" class="button primary" data-i18n-title="generate" title="Tạo Bảng Mới"><svg class="icon" aria-hidden="true"><use href="#icon-spark"/></svg><span data-i18n="generate">Tạo Bảng Mới</span></button>
+          <button id="print-button" type="button" class="button" disabled data-i18n-title="print" data-i18n-aria-label="print" title="In A4" aria-label="In A4"><svg class="icon" aria-hidden="true"><use href="#icon-print"/></svg><span data-i18n="printText">In</span></button>
         </div></div>
         <div id="puzzle-content" hidden>
           <div class="paper-title" data-i18n="brand">mê cung con vật</div>
@@ -76,7 +75,7 @@
         </div>
       </section>
     </main>
-    <footer class="site-footer"><span data-i18n="footer">Một chút tập trung, một niềm vui nhỏ.</span><span><span id="sequence-length-range">2–7</span> <span data-i18n="perSequence">con vật / đáp án</span></span></footer>
+    <footer class="site-footer"><span data-i18n="footer">Một chút tập trung, một niềm vui nhỏ.</span><span><span id="sequence-length-range">3–4</span> <span data-i18n="perSequence">con vật / đáp án</span></span></footer>
   </div>
   <noscript><p lang="vi">Bật JavaScript để chơi.</p><p lang="en">Enable JavaScript to play.</p></noscript>
 </body>

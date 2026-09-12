@@ -76,11 +76,11 @@
       foundLabel: '{word}: đã tìm thấy',
       selectionDefault: 'Kéo từ ô đầu đến ô cuối, hoặc chạm lần lượt hai ô.',
       selectionPreview: '{letters} · Chọn ô cuối để đánh dấu',
-      selectionInvalid: 'Hãy chọn một đường thẳng: ngang, dọc hoặc chéo.',
+      selectionInvalid: 'Hãy chọn một đường thẳng theo hướng đã bật cho bảng này.',
       statusInitial: 'Mọi cuộc khám phá đều bắt đầu từ một con chữ.',
       statusReady: 'Bảng chữ đã sẵn sàng. Bạn sẽ tìm thấy từ nào đầu tiên?',
-      statusDirection: 'Chưa đúng hướng. Hãy chọn các ô trên cùng một đường thẳng.',
-      statusNoMatch: '“{letters}” chưa thuộc danh sách. Thử một đường khác nhé!',
+      statusDirection: 'Chưa đúng hướng. Hãy chọn một đường thẳng theo hướng đã bật cho bảng này.',
+      statusNoMatch: '“{letters}” chưa khớp từ nào theo hướng đã bật. Thử một đường khác nhé!',
       statusAlreadyFound: 'Bạn đã tìm thấy {words} rồi. Tìm tiếp những từ còn lại nhé!',
       statusComplete: 'Tuyệt vời! Bạn đã tìm đủ {total} từ. Tạo một bảng mới để khám phá tiếp nhé!',
       statusFound: 'Đã tìm thấy {words}. Còn {remaining} từ nữa!',
@@ -160,11 +160,11 @@
       foundLabel: '{word}: found',
       selectionDefault: 'Drag from the first to the last cell, or tap the two cells in turn.',
       selectionPreview: '{letters} · Select the last cell to mark the word',
-      selectionInvalid: 'Choose a straight line: across, down or diagonally.',
+      selectionInvalid: 'Choose a straight line in a direction enabled for this puzzle.',
       statusInitial: 'Every discovery begins with a letter.',
       statusReady: 'Your puzzle is ready. Which word will you find first?',
-      statusDirection: 'Not quite aligned. Select cells along a straight line.',
-      statusNoMatch: '"{letters}" is not in the list. Try another line!',
+      statusDirection: 'Choose a straight line in a direction enabled for this puzzle.',
+      statusNoMatch: '"{letters}" does not match a word in an enabled direction. Try another line!',
       statusAlreadyFound: 'You already found {words}. Keep looking for the remaining words!',
       statusComplete: 'You found every word! Create another puzzle to keep exploring.',
       statusFound: 'Found {words}. {remaining} left!',
@@ -555,6 +555,9 @@
     const deltaRow = end[0] - start[0];
     const deltaCol = end[1] - start[1];
     if (deltaRow !== 0 && deltaCol !== 0 && Math.abs(deltaRow) !== Math.abs(deltaCol)) return [];
+    if ((deltaRow !== 0 || deltaCol !== 0) && !game.directions.some(([rowStep, colStep]) =>
+      (rowStep === Math.sign(deltaRow) && colStep === Math.sign(deltaCol)) ||
+      (rowStep === -Math.sign(deltaRow) && colStep === -Math.sign(deltaCol)))) return [];
     const length = Math.max(Math.abs(deltaRow), Math.abs(deltaCol)) + 1;
     return Array.from({ length }, (_, offset) => [start[0] + offset * Math.sign(deltaRow), start[1] + offset * Math.sign(deltaCol)]);
   }
@@ -597,8 +600,12 @@
     }
     const selected = path.map(([row, col]) => game.board[row][col]).join('');
     const reversed = [...selected].reverse().join('');
-    // Accept any genuine occurrence, including incidental words in the random filler.
-    const matches = game.words.filter((word) => word === selected || word === reversed);
+    const rowStep = Math.sign(end[0] - selectionStart[0]);
+    const colStep = Math.sign(end[1] - selectionStart[1]);
+    const forwardAllowed = path.length === 1 || game.directions.some(([dr, dc]) => dr === rowStep && dc === colStep);
+    const backwardAllowed = path.length === 1 || game.directions.some(([dr, dc]) => dr === -rowStep && dc === -colStep);
+    const matches = game.words.filter((word) =>
+      (forwardAllowed && word === selected) || (backwardAllowed && word === reversed));
     const newMatches = matches.filter((word) => !game.found.has(word));
     clearSelection();
     if (!matches.length) {
