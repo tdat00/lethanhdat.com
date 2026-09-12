@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#16745b">
+<title>Trò chơi tìm số</title>
+<link rel="stylesheet" href="word-search-puzzle.css">
+<link rel="stylesheet" href="find-number-puzzle.css">
+</head>
+<body class="has-game-menu">
+    <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <symbol id="icon-sliders" viewBox="0 0 24 24"><path d="M4 7h6m4 0h6M4 17h10m4 0h2"/><circle cx="12" cy="7" r="2"/><circle cx="16" cy="17" r="2"/></symbol>
+        <symbol id="icon-spark" viewBox="0 0 24 24"><path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5L12 3ZM20 2v4m-2-2h4"/></symbol>
+        <symbol id="icon-print" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7zM16 11h1"/></symbol>
+    </svg>
+
+    <nav class="game-menu" aria-label="Chọn trò chơi" data-i18n-aria-label="gamesMenu">
+        <p class="game-menu-title" data-i18n="gamesTitle">Trò chơi</p>
+        <a class="game-menu-link" href="word-search-puzzle.html"><span class="game-menu-mark" aria-hidden="true">Aa</span><span data-i18n="gameWords">Tìm chữ</span></a>
+        <a class="game-menu-link" href="find-number-puzzle.html" aria-current="page"><span class="game-menu-mark" aria-hidden="true">#</span><span data-i18n="gameNumbers">Tìm số</span></a>
+        <a class="game-menu-link" href="animal-search-puzzle.html"><span class="game-menu-mark" aria-hidden="true">◉</span><span data-i18n="gameAnimals">Tìm con vật</span></a>
+    </nav>
+
+    <div class="shell">
+        <header class="site-header">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+                <div class="brand-name"><span data-i18n="brand">mê cung số</span><span class="brand-tagline" data-i18n="tagline">CHƠI · HỌC · KHÁM PHÁ</span></div>
+            </div>
+            <div class="header-actions">
+                <details id="language-picker" class="language-picker">
+                    <summary id="language-toggle" aria-labelledby="language-label language-current">
+                        <img id="language-flag" class="language-flag" src="../assets/images/flag-vn.png" width="24" height="16" alt="">
+                        <span id="language-current" lang="vi">Tiếng Việt</span>
+                    </summary>
+                    <fieldset id="language" class="language-options">
+                        <legend id="language-label" class="sr-only" data-i18n="language">Ngôn ngữ</legend>
+                        <label class="language-option" lang="vi">
+                            <img class="language-flag" src="../assets/images/flag-vn.png" width="24" height="16" alt="">
+                            <span>Tiếng Việt</span>
+                            <input type="radio" name="language" value="vi" checked>
+                        </label>
+                        <label class="language-option" lang="en">
+                            <img class="language-flag" src="../assets/images/flag-us.png" width="24" height="16" alt="">
+                            <span>English</span>
+                            <input type="radio" name="language" value="en">
+                        </label>
+                    </fieldset>
+                </details>
+            </div>
+        </header>
+
+        <main>
+            <section class="intro" aria-labelledby="page-title">
+                <div>
+                    <p class="eyebrow" data-i18n="eyebrow">GÓC NHỎ CHO TRÍ TÒ MÒ</p>
+                    <h1 id="page-title"><span class="headline-first" data-i18n="headlineFirst">Trò chơi</span> <span data-i18n="headlineSecond">tìm số.</span></h1>
+                </div>
+            </section>
+
+            <div class="workspace">
+                <aside class="settings-column" aria-label="Thiết lập trò chơi" data-i18n-aria-label="settingsLabel">
+                    <form id="settings-form" class="settings card controls" novalidate>
+                        <div class="section-heading"><svg class="icon" aria-hidden="true"><use href="#icon-sliders"/></svg><h2 data-i18n="settingsTitle">Thiết kế thử thách</h2></div>
+                        <div class="field-section">
+                            <div class="field-title"><span class="step">01</span> <span data-i18n="rangeLabel">Khoảng số</span></div>
+                            <div class="dimension-fields">
+                                <div><label for="minNum" data-i18n="fromNumber">Từ số</label><input type="number" id="minNum" value="1" min="1" step="1" inputmode="numeric"></div>
+                                <span class="multiply" aria-hidden="true">–</span>
+                                <div><label for="maxNum" data-i18n="toNumber">Đến số</label><input type="number" id="maxNum" value="100" min="1" step="1" inputmode="numeric"></div>
+                            </div>
+                        </div>
+                        <button type="submit" id="generateBtn" class="button button-primary generate"><svg class="icon" aria-hidden="true"><use href="#icon-spark"/></svg> <span data-i18n="generate">Tạo bảng số</span></button>
+                    </form>
+                </aside>
+
+                <section class="puzzle-panel card" aria-labelledby="panel-title">
+                    <div class="panel-toolbar">
+                        <div class="panel-heading"><h2 id="panel-title" data-i18n="panelTitle">Bảng tìm số</h2><span id="numberCount" class="state-badge active" role="status">100 số</span></div>
+                        <button type="button" id="printBtn" class="button button-secondary print-button" aria-label="In bảng tìm số ra giấy A4 ngang" data-i18n-aria-label="printLabel"><svg class="icon" aria-hidden="true"><use href="#icon-print"/></svg> <span data-i18n="print">In A4</span></button>
+                    </div>
+                    <div class="puzzle-content">
+                        <div class="puzzle-meta"><span id="numberRange">1 – 100</span><span class="meta-tag" data-i18n="paperSize">A4 ngang · 297 × 210 mm</span></div>
+                        <div class="board-frame">
+                            <div id="paper-preview" class="paper-preview">
+                                <div class="page" id="page" role="group" aria-label="Bảng tìm số" data-i18n-aria-label="panelTitle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+        <footer class="site-footer"><span data-i18n="footerFirst">Được tạo cho những phút giây vừa chơi, vừa học.</span><span data-i18n="footerSecond">Chậm lại một chút. Tìm thêm một số.</span></footer>
+    </div>
+    <noscript><p lang="vi">Hãy bật JavaScript trong trình duyệt để tạo bảng tìm số.</p><p lang="en">Enable JavaScript in your browser to create a number search puzzle.</p></noscript>
+
+    <script>
+        const page = document.getElementById("page");
+        const preview = document.getElementById("paper-preview");
+        const printBtn = document.getElementById("printBtn");
+        const minInput = document.getElementById("minNum");
+        const maxInput = document.getElementById("maxNum");
+        const languagePicker = document.getElementById("language-picker");
+        const languageToggle = document.getElementById("language-toggle");
+        const languageStorageKey = "word-search-language";
+        const translations = {
+            vi: {
+                title: "Trò chơi tìm số",
+                language: "Ngôn ngữ",
+                gamesMenu: "Chọn trò chơi",
+                gamesTitle: "Trò chơi",
+                gameWords: "Tìm chữ",
+                gameNumbers: "Tìm số",
+                gameAnimals: "Tìm con vật",
+                brand: "mê cung số",
+                tagline: "CHƠI · HỌC · KHÁM PHÁ",
+                eyebrow: "GÓC NHỎ CHO TRÍ TÒ MÒ",
+                headlineFirst: "Trò chơi",
+                headlineSecond: "tìm số.",
+                settingsLabel: "Thiết lập trò chơi",
+                settingsTitle: "Thiết kế thử thách",
+                rangeLabel: "Khoảng số",
+                fromNumber: "Từ số",
+                toNumber: "Đến số",
+                generate: "Tạo bảng số",
+                panelTitle: "Bảng tìm số",
+                numberCount: "{count} số",
+                numberCountOne: "{count} số",
+                print: "In A4",
+                printLabel: "In bảng tìm số ra giấy A4 ngang",
+                paperSize: "A4 ngang · 297 × 210 mm",
+                footerFirst: "Được tạo cho những phút giây vừa chơi, vừa học.",
+                footerSecond: "Chậm lại một chút. Tìm thêm một số."
+            },
+            en: {
+                title: "Number Maze - Number Search Puzzle",
+                language: "Language",
+                gamesMenu: "Choose a game",
+                gamesTitle: "Games",
+                gameWords: "Word search",
+                gameNumbers: "Number search",
+                gameAnimals: "Animal search",
+                brand: "number maze",
+                tagline: "PLAY · LEARN · EXPLORE",
+                eyebrow: "A LITTLE SPACE FOR CURIOSITY",
+                headlineFirst: "Find the",
+                headlineSecond: "numbers.",
+                settingsLabel: "Game settings",
+                settingsTitle: "Design your challenge",
+                rangeLabel: "Number range",
+                fromNumber: "From",
+                toNumber: "To",
+                generate: "Create puzzle",
+                panelTitle: "Number search",
+                numberCount: "{count} numbers",
+                numberCountOne: "{count} number",
+                print: "Print A4",
+                printLabel: "Print the number search on A4 landscape paper",
+                paperSize: "A4 landscape · 297 × 210 mm",
+                footerFirst: "Made for moments of play and learning.",
+                footerSecond: "Slow down a little. Find one more number."
+            }
+        };
+        let language = "vi";
+        let currentPuzzle = null;
+
+        function refreshPuzzleText() {
+            if (!currentPuzzle) return;
+            const locale = language === "vi" ? "vi-VN" : "en-US";
+            const countKey = currentPuzzle.total === 1 ? "numberCountOne" : "numberCount";
+            document.getElementById("numberCount").textContent = translations[language][countKey]
+                .replace("{count}", currentPuzzle.total.toLocaleString(locale));
+            document.getElementById("numberRange").textContent = currentPuzzle.min.toLocaleString(locale) + " – " + currentPuzzle.max.toLocaleString(locale);
+        }
+
+        function applyLanguage(nextLanguage) {
+            language = Object.hasOwn(translations, nextLanguage) ? nextLanguage : "vi";
+            document.documentElement.lang = language;
+            document.title = translations[language].title;
+            const languageInput = languagePicker.querySelector(`input[value="${language}"]`);
+            languageInput.checked = true;
+            const option = languageInput.closest(".language-option");
+            document.getElementById("language-flag").src = option.querySelector("img").src;
+            document.getElementById("language-current").textContent = option.querySelector("span").textContent;
+            document.getElementById("language-current").lang = language;
+            document.querySelectorAll("[data-i18n]").forEach((element) => {
+                element.textContent = translations[language][element.dataset.i18n];
+            });
+            document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+                element.setAttribute("aria-label", translations[language][element.dataset.i18nAriaLabel]);
+            });
+            document.querySelectorAll(".game-menu-link").forEach((link) => {
+                const url = new URL(link.href);
+                url.searchParams.set("lang", language);
+                link.href = url.href;
+            });
+            refreshPuzzleText();
+        }
+
+        function initialLanguage() {
+            const requested = new URL(window.location.href).searchParams.get("lang");
+            if (Object.hasOwn(translations, requested)) return requested;
+            try {
+                const saved = localStorage.getItem(languageStorageKey);
+                if (Object.hasOwn(translations, saved)) return saved;
+            } catch {}
+            return "vi";
+        }
+
+        function resizePreview() {
+            page.style.setProperty("--preview-scale", preview.clientWidth / page.offsetWidth);
+        }
+
+        // Kích thước vùng đặt số (px), tương ứng khổ A4 khi hiển thị
+        function getPageSize() {
+            return {
+                width: page.clientWidth,
+                height: page.clientHeight
+            };
+        }
+
+        // Trộn mảng ngẫu nhiên (Fisher-Yates)
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function generate() {
+            let min = parseInt(minInput.value, 10);
+            let max = parseInt(maxInput.value, 10);
+
+            if (isNaN(min)) min = 1;
+            if (isNaN(max)) max = 100;
+            if (min > max) [min, max] = [max, min];
+
+            page.innerHTML = "";
+
+            // Đảm bảo chiều cao tối thiểu bằng A4 để tính toán
+            const size = getPageSize();
+            const areaW = size.width;
+            const areaH = Math.max(size.height, page.scrollHeight, 794); // ~210mm
+
+            const numbers = [];
+            for (let n = min; n <= max; n++) numbers.push(n);
+            shuffle(numbers);
+
+            const total = numbers.length;
+            currentPuzzle = { min, max, total };
+            refreshPuzzleText();
+
+            // Cỡ chữ tự điều chỉnh theo số lượng để vừa trang.
+            // Ít số -> chữ to hơn; nhiều số -> chữ nhỏ lại.
+            let fontSize = 26;
+            if (total <= 10) fontSize = 80;
+            else if (total <= 20) fontSize = 60;
+            else if (total <= 30) fontSize = 46;
+            else if (total <= 45) fontSize = 36;
+            else if (total <= 60) fontSize = 30;
+            else if (total <= 100) fontSize = 22;
+            else if (total <= 150) fontSize = 18;
+            else fontSize = 15;
+
+            // Lề an toàn ~10mm để không bị cắt khi in (1mm ≈ 3.78px)
+            const margin = 38;
+            const usableW = areaW - margin * 2;
+            const usableH = areaH - margin * 2;
+
+            // Chia trang thành lưới ô đều nhau để dàn trải số ra khắp trang.
+            // Số cột/hàng tính theo tỉ lệ trang để mỗi ô gần vuông.
+            const ratio = usableW / usableH;
+            let cols = Math.max(1, Math.round(Math.sqrt(total * ratio)));
+            let rows = Math.ceil(total / cols);
+            // Đảm bảo đủ ô chứa hết các số
+            while (cols * rows < total) cols++;
+
+            const cellW = usableW / cols;
+            const cellH = usableH / rows;
+
+            // Danh sách vị trí ô, trộn ngẫu nhiên để số không xếp theo thứ tự lưới
+            const cells = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    cells.push({ r, c });
+                }
+            }
+            shuffle(cells);
+
+            numbers.forEach((n, i) => {
+                const el = document.createElement("span");
+                el.className = "number";
+                el.textContent = n;
+                el.style.fontSize = fontSize + "px";
+                page.appendChild(el);
+
+                const w = el.offsetWidth;
+                const h = el.offsetHeight;
+
+                const cell = cells[i];
+                // Vị trí gốc của ô
+                const cellX = margin + cell.c * cellW;
+                const cellY = margin + cell.r * cellH;
+
+                // Đặt ngẫu nhiên bên trong ô (jitter) nhưng vẫn nằm trọn trong ô
+                const jitterX = Math.max(0, cellW - w);
+                const jitterY = Math.max(0, cellH - h);
+                const x = cellX + Math.random() * jitterX;
+                const y = cellY + Math.random() * jitterY;
+
+                // Xoay ngẫu nhiên để tạo độ khó
+                const rotation = Math.floor(Math.random() * 121) - 60; // -60 đến 60 độ
+
+                el.style.left = x + "px";
+                el.style.top = y + "px";
+                el.style.transform = "rotate(" + rotation + "deg)";
+            });
+        }
+
+        document.getElementById("settings-form").addEventListener("submit", (event) => {
+            event.preventDefault();
+            generate();
+        });
+        printBtn.addEventListener("click", () => window.print());
+
+        document.getElementById("language").addEventListener("change", (event) => {
+            if (event.target.name !== "language" || !event.target.checked) return;
+            applyLanguage(event.target.value);
+            languagePicker.open = false;
+            languageToggle.focus({ preventScroll: true });
+            try { localStorage.setItem(languageStorageKey, language); } catch {}
+            const url = new URL(window.location.href);
+            url.searchParams.set("lang", language);
+            try { window.history.replaceState(null, "", url); } catch {}
+        });
+        document.addEventListener("pointerdown", (event) => {
+            if (!languagePicker.contains(event.target)) languagePicker.open = false;
+        });
+        document.addEventListener("focusin", (event) => {
+            if (!languagePicker.contains(event.target)) languagePicker.open = false;
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && languagePicker.open) {
+                languagePicker.open = false;
+                languageToggle.focus({ preventScroll: true });
+            }
+        });
+        applyLanguage(initialLanguage());
+
+        if ("ResizeObserver" in window) new ResizeObserver(resizePreview).observe(preview);
+        else window.addEventListener("resize", resizePreview);
+
+        // Tạo sẵn khi mở trang
+        window.addEventListener("load", () => {
+            resizePreview();
+            generate();
+        });
+    </script>
+</body>
+</html>

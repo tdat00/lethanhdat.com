@@ -1,0 +1,28 @@
+h1, h2, .brand-name, .brand-tagline, .eyebrow, .state-badge, .site-footer { letter-spacing: 0; }
+h1 { font-size: 36px; }
+.workspace { grid-template-columns: minmax(0, 1fr); }
+.settings-column { position: static; }
+.controls { display: grid; grid-template-columns: minmax(180px, 1fr) minmax(220px, 360px) auto; align-items: end; gap: 24px; }
+.controls .section-heading { margin: 0; align-self: center; }
+.controls .generate { width: auto; min-width: 160px; margin: 0; }
+.puzzle-panel { width: 100%; }
+.state-badge { text-transform: uppercase; }
+.paper-preview { position: relative; width: 100%; aspect-ratio: 297 / 210; overflow: hidden; background: var(--paper); }
+.page { position: absolute; top: 0; left: 0; width: 297mm; height: 210mm; margin: 0; overflow: hidden; background: var(--paper); transform: scale(var(--preview-scale, 1)); transform-origin: top left; }
+.number { position: absolute; font-weight: 700; color: var(--ink); user-select: none; white-space: nowrap; }
+
+@media (max-width: 760px) {
+  h1 { font-size: 29px; }
+  .intro { padding: 25px 0 22px; }
+  .controls { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .controls .generate { width: 100%; min-width: 0; }
+}
+
+@page { size: A4 landscape; margin: 0; }
+@media print {
+  .puzzle-meta { display: none; }
+  .puzzle-content { padding: 0; }
+  .paper-preview { width: 297mm; height: 210mm; aspect-ratio: auto; overflow: visible; }
+  .page { position: relative; transform: none; break-inside: avoid; }
+  .number { color: #111; }
+}
