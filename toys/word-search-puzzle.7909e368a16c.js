@@ -65,6 +65,7 @@
       errorLetters: 'Chỉ dùng chữ A–Z, không dấu và không chữ số. Vui lòng sửa: {words}.',
       errorCount: 'Mỗi bảng hỗ trợ tối đa 40 từ khác nhau để dễ chơi và in trên một trang A4.',
       errorDirections: 'Chọn ít nhất một hướng: Ngang, Dọc hoặc Chéo. “Ngược” cần đi cùng một trong các hướng này.',
+      errorContained: 'Hai từ chứa nhau theo hướng đã chọn: {words}. Hãy bỏ một từ để các đáp án không chồng lên nhau quá một ô.',
       errorLength: 'Từ không vừa bảng theo hướng đã chọn: {words}. Hãy tăng kích thước hoặc đổi hướng.',
       errorCapacity: 'Bảng quá nhỏ để chứa các chữ cái của tất cả các từ. Hãy tăng kích thước hoặc bớt từ.',
       errorPlacement: 'Chưa thể xếp đủ tất cả các từ vào bảng này. Hãy tăng kích thước, bật thêm hướng, bớt từ hoặc thử tạo lại. Bảng cũ (nếu có) vẫn được giữ nguyên.',
@@ -149,6 +150,7 @@
       errorLetters: 'Use only letters A-Z, without accents or numbers. Please fix: {words}.',
       errorCount: 'Each puzzle supports up to 40 unique words to keep it playable and printable on one A4 page.',
       errorDirections: 'Choose at least one direction: Across, Down or Diagonal. "Reverse" must be combined with one of these.',
+      errorContained: 'These words contain one another in the selected directions: {words}. Remove one so answers share at most one cell.',
       errorLength: 'These words do not fit in the selected directions: {words}. Increase the grid size or change directions.',
       errorCapacity: 'The grid is too small for all the letters in your words. Increase the grid size or remove some words.',
       errorPlacement: 'Could not fit every word in this grid. Increase the size, enable more directions, remove some words or try again. Your previous puzzle, if any, is unchanged.',
@@ -264,6 +266,21 @@
     return directions;
   }
 
+  function findContainedWords(words, directions) {
+    const reverseAllowed = directions.some(([dr, dc]) =>
+      directions.some(([otherRow, otherCol]) => dr === -otherRow && dc === -otherCol));
+    for (const [index, word] of words.entries()) {
+      if (word.length < 2) continue;
+      const reversed = [...word].reverse().join('');
+      for (const other of words.slice(index + 1)) {
+        if (other.length < 2) continue;
+        if (word.includes(other) || other.includes(word) ||
+            (reverseAllowed && (reversed.includes(other) || other.includes(reversed)))) return [word, other];
+      }
+    }
+    return null;
+  }
+
   function showFormError(key, element, values = {}) {
     formError = { key, values };
     $('form-error').textContent = translate(key, values);
@@ -303,6 +320,11 @@
       showFormError('errorDirections', form.querySelector('input[name="mode"]'));
       return null;
     }
+    const contained = findContainedWords(words, directions);
+    if (contained) {
+      showFormError('errorContained', $('words'), { words: contained.join(', ') });
+      return null;
+    }
     const tooLong = words.filter((word) => !directions.some(([dr, dc]) =>
       (dr === 0 || word.length <= rows) && (dc === 0 || word.length <= cols)));
     if (tooLong.length) {
@@ -316,8 +338,46 @@
     return { rows, cols, words, modes, directions };
   }
 
+  function canPlacePath(path, placements) {
+    const occupied = new Set(path.map(([row, col]) => `${row},${col}`));
+    return placements.every((placement) => {
+      let overlap = 0;
+      for (const [row, col] of placement.path) {
+        if (occupied.has(`${row},${col}`) && ++overlap > 1) return false;
+      }
+      return true;
+    });
+  }
+
+  function hasValidIntersections(board, words, directions) {
+    const placements = [];
+    for (const word of words) {
+      const paths = [];
+      for (const [dr, dc] of directions) {
+        for (let row = 0; row < board.length; row++) {
+          for (let col = 0; col < board[row].length; col++) {
+            if (board[row][col] !== word[0]) continue;
+            const path = [];
+            for (let offset = 0; offset < word.length; offset++) {
+              const pathRow = row + offset * dr;
+              const pathCol = col + offset * dc;
+              if (board[pathRow]?.[pathCol] !== word[offset]) break;
+              path.push([pathRow, pathCol]);
+            }
+            if (path.length !== word.length) continue;
+            if (!canPlacePath(path, placements)) return false;
+            paths.push({ path });
+          }
+        }
+      }
+      placements.push(...paths);
+    }
+    return true;
+  }
+
   function createPuzzle(settings) {
     const { rows, cols, words, directions } = settings;
+    if (findContainedWords(words, directions)) return null;
     const board = Array.from({ length: rows }, () => Array(cols).fill(''));
     const deadline = performance.now() + 1800;
     const timedOut = Symbol('search-budget');
@@ -328,7 +388,7 @@
     const placements = [];
 
     function solve(index) {
-      if (index === ordered.length) return true;
+      if (index === ordered.length) return hasValidIntersections(board, words, directions);
       if (++visits > 18000 || performance.now() > deadline) throw timedOut;
       const word = ordered[index].word;
       const candidates = [];
@@ -347,18 +407,19 @@
               if (letter && letter !== word[offset]) { compatible = false; break; }
               if (letter) overlap++;
             }
-            if (compatible) candidates.push({ row, col, dr, dc, score: overlap + Math.random() * 3 });
+            if (!compatible) continue;
+            const path = Array.from({ length: word.length }, (_, offset) => [row + offset * dr, col + offset * dc]);
+            if (overlap > 1 && !canPlacePath(path, placements)) continue;
+            candidates.push({ path, score: overlap + Math.random() * 3 });
           }
         }
       }
       candidates.sort((first, second) => second.score - first.score);
       for (const candidate of candidates) {
         const changed = [];
-        const path = [];
+        const path = candidate.path;
         for (let offset = 0; offset < word.length; offset++) {
-          const row = candidate.row + offset * candidate.dr;
-          const col = candidate.col + offset * candidate.dc;
-          path.push([row, col]);
+          const [row, col] = path[offset];
           if (!board[row][col]) {
             changed.push([row, col]);
             board[row][col] = word[offset];
@@ -378,12 +439,20 @@
       if (error === timedOut) return null;
       throw error;
     }
-    for (const row of board) {
+    const emptyCells = [];
+    for (let row = 0; row < rows; row++) {
       for (let col = 0; col < cols; col++) {
-        if (!row[col]) row[col] = alphabet[Math.floor(Math.random() * alphabet.length)];
+        if (!board[row][col]) emptyCells.push([row, col]);
       }
     }
-    return { ...settings, board, placements, found: new Set() };
+    for (let attempt = 0; attempt < 30; attempt++) {
+      for (const [row, col] of emptyCells) {
+        board[row][col] = alphabet[Math.floor(Math.random() * alphabet.length)];
+      }
+      if (hasValidIntersections(board, words, directions)) return { ...settings, board, placements, found: new Set() };
+      if (performance.now() > deadline) break;
+    }
+    return null;
   }
 
   function resizeGrid() {

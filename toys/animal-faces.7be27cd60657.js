@@ -1,68 +1,240 @@
 (() => {
   'use strict';
 
-  const eyes = '<g fill="#302e2c" stroke="none"><ellipse cx="36" cy="51" rx="3.5" ry="4.5"/><ellipse cx="64" cy="51" rx="3.5" ry="4.5"/></g>';
-  const nose = '<path d="M45 62q5-3 10 0l-5 5z" fill="#403932"/><path d="M50 67v6m0-1q-7 7-11 0m11 0q7 7 11 0" fill="none"/>';
-  const roundHead = (color) => `<ellipse cx="50" cy="55" rx="33" ry="32" fill="${color}"/>`;
-  const ears = (color) => `<g fill="${color}"><circle cx="25" cy="27" r="13"/><circle cx="75" cy="27" r="13"/></g>`;
-  const muzzle = (color = '#fff8e8') => `<ellipse cx="50" cy="68" rx="20" ry="15" fill="${color}" stroke="none"/>`;
-  const drawings = [
-    ['tiger', 'Hổ', 'Tiger', ears('#f3a329') + roundHead('#ffb83e') + '<g fill="#49352c" stroke="none"><path d="M43 24h14l-7 17zM19 43l15 7-17 3zM81 43l-15 7 17 3zM20 61l14 1-10 9zM80 61l-14 1 10 9z"/></g>' + muzzle() + eyes + nose],
-    ['lion', 'Sư tử', 'Lion', '<path d="M50 7 62 13 76 12 81 25 92 34 87 48 92 63 80 72 74 87 59 86 50 94 39 86 25 87 19 73 8 63 13 48 8 34 19 25 24 12 38 13z" fill="#df913e"/>' + ears('#f2c65d') + roundHead('#ffe082') + muzzle() + eyes + nose],
-    ['pig', 'Lợn', 'Pig', '<path d="M22 40Q4 8 14 10l27 17m18 0 27-17q10-2-8 30" fill="#eb88a8"/>' + roundHead('#ffb3ce') + eyes + '<ellipse cx="50" cy="68" rx="20" ry="14" fill="#e87ca1"/><g fill="#8f4b62" stroke="none"><ellipse cx="42" cy="67" rx="3" ry="4"/><ellipse cx="58" cy="67" rx="3" ry="4"/></g>'],
-    ['dog', 'Chó', 'Dog', '<path d="M25 22Q4 19 8 61q9 13 18-8m49-31q21-3 17 39-9 13-18-8" fill="#3985bd"/>' + roundHead('#79c4f2') + '<ellipse cx="34" cy="49" rx="13" ry="18" fill="#4e9ed5" stroke="none"/>' + muzzle('#eaf6ff') + eyes + '<path d="M45 77v6q5 8 10 0v-6" fill="#ec8794"/>' + nose],
-    ['cat', 'Mèo', 'Cat', '<path d="M18 46 14 10 41 28m18 0 27-18-4 36" fill="#4bb696"/>' + roundHead('#7cddbd') + '<path d="m21 22 11 11-11 3m58-14-11 11 11 3" fill="#e99593" stroke="none"/>' + eyes + nose + '<path d="m30 62-18-4m18 12-18 4m58-12 18-4m-18 12 18 4" fill="none"/>'],
-    ['rabbit', 'Thỏ', 'Rabbit', '<g fill="#f9f5ed"><ellipse cx="34" cy="28" rx="11" ry="25" transform="rotate(-12 34 28)"/><ellipse cx="66" cy="28" rx="11" ry="25" transform="rotate(12 66 28)"/></g><path d="M32 12 36 39m32-27-4 27" stroke="#e9a3b2" stroke-width="8"/>' + '<ellipse cx="50" cy="61" rx="32" ry="29" fill="#fff9ee"/>' + '<g transform="translate(0 7)">' + eyes + '<path d="M44 68h12v12H44z" fill="white"/><path d="M50 69v10"/>' + nose + '</g>'],
-    ['panda', 'Gấu trúc', 'Panda', ears('#393e43') + roundHead('#fffdf5') + '<g fill="#393e43" stroke="none"><ellipse cx="34" cy="50" rx="12" ry="15" transform="rotate(25 34 50)"/><ellipse cx="66" cy="50" rx="12" ry="15" transform="rotate(-25 66 50)"/></g><g fill="white" stroke="none"><circle cx="36" cy="49" r="3"/><circle cx="64" cy="49" r="3"/></g>' + nose],
-    ['penguin', 'Chim cánh cụt', 'Penguin', '<path d="M16 64C16 34 27 10 50 10s34 24 34 54q0 25-34 25T16 64z" fill="#44536b"/><path d="M50 41C24 13 20 49 23 65q2 19 27 19t27-19c3-16-1-52-27-24z" fill="#f2f7ff"/>' + eyes + '<path d="m37 66 13-9 13 9-13 10z" fill="#ef983d"/><path d="M38 66h24" fill="none"/>'],
-    ['fox', 'Cáo', 'Fox', '<path d="M19 47 13 7 40 29h20L87 7l-6 40" fill="#e9763c"/><path d="M18 36Q50 20 82 36L89 62 50 89 11 62z" fill="#f68c45"/><path d="M16 54q22-5 34 24 12-29 34-24L50 89z" fill="#fff7e8" stroke="none"/>' + eyes + '<path d="m45 77 5 4 5-4z" fill="#403932"/>'],
-    ['rhino', 'Tê giác', 'Rhinoceros', '<path d="M28 36Q10 28 14 10q20 1 23 24m26 0q3-23 23-24 4 18-14 26" fill="#8e9caa"/><path d="M23 40q0-16 27-16t27 16l7 29q4 20-34 20T16 69z" fill="#abb8c4"/><rect x="18" y="60" width="64" height="27" rx="12" fill="#ccd6df"/>' + eyes + '<path d="M39 66Q45 52 50 25q5 27 11 41Z" fill="#fff6df"/><path d="M30 70v3m40-3v3M38 81h24" fill="none"/>'],
-    ['elephant', 'Voi', 'Elephant', '<g fill="#42a9bd"><ellipse cx="19" cy="51" rx="16" ry="28"/><ellipse cx="81" cy="51" rx="16" ry="28"/></g><g fill="#b4eaf0" stroke="none"><ellipse cx="19" cy="51" rx="9" ry="19"/><ellipse cx="81" cy="51" rx="9" ry="19"/></g>' + roundHead('#78d3dd') + eyes + '<path d="M42 65v20q1 16 20 6l-4-10q-7 6-7-1V65" fill="#78d3dd"/><path d="M37 67 30 79q9-1 9-9m24-3 7 12q-9-1-9-9" fill="#fffbea"/>'],
-    ['monkey', 'Khỉ', 'Monkey', '<g fill="#f0ac8c"><circle cx="15" cy="53" r="12"/><circle cx="85" cy="53" r="12"/></g>' + roundHead('#dc856a') + '<path d="M50 40C23 15 15 60 29 77q21 20 42 0c14-17 6-62-21-37z" fill="#ffe0c6"/>' + eyes + '<path d="M46 61h8m-18 8q14 16 28 0" fill="none"/>'],
-    ['cow', 'Bò', 'Cow', '<path d="M28 27 27 10q-15 5-9 22m54-5 1-17q15 5 9 22" fill="#eee0ab"/><path d="M24 36Q0 24 5 46q8 10 21 3m50-13q24-12 19 10-8 10-21 3" fill="#f6f2e7"/>' + roundHead('#fffdf6') + '<path d="M23 33q21-17 21 9-1 18-19 16" fill="#42464b" stroke="none"/>' + eyes + '<ellipse cx="50" cy="72" rx="24" ry="15" fill="#f3b5bb"/><g fill="#945a61" stroke="none"><circle cx="40" cy="70" r="3"/><circle cx="60" cy="70" r="3"/></g>'],
-    ['sheep', 'Cừu', 'Sheep', '<path d="M28 42Q2 30 7 55l20 6m45-19q26-12 21 13l-20 6" fill="#a8ba92"/><ellipse cx="50" cy="59" rx="28" ry="31" fill="#d4dfbd"/><path d="M20 41Q4 31 19 22q-1-17 18-13 13-12 26 0 19-4 18 13 15 9-1 19-8 8-18 0-12 9-24 0-10 8-18 0z" fill="#f6fbdc"/>' + '<g transform="translate(0 7)">' + eyes + nose + '</g>'],
-    ['goat', 'Dê', 'Goat', '<path d="M28 34Q13 9 34 5l4 25m24 0 4-25q21 4 6 29" fill="#827965"/><path d="m40 77 10 19 10-19" fill="#f3e7cc"/><path d="M24 41 5 34q-2 21 19 18m52-11 19-7q2 21-19 18" fill="#c4b28d"/>' + roundHead('#dfcda6') + eyes + nose],
-    ['zebra', 'Ngựa vằn', 'Zebra', '<path d="M28 36Q15 3 29 8l15 25m12 0L71 8q14-5 1 28" fill="#e5f3fc"/><path d="M26 39q0-23 24-24t24 24v30q0 22-24 22T26 69z" fill="#edf7ff"/><path d="M41 15h18l-9 24zM27 35l13 8-14 2m47-10-13 8 14 2M26 54l13 6-13 5m48-11-13 6 13 5" fill="#35485a" stroke="none"/>' + eyes + '<ellipse cx="50" cy="75" rx="23" ry="15" fill="#a0b7c9"/><path d="M38 73h2m20 0h2" stroke-width="5"/>'],
-    ['giraffe', 'Hươu cao cổ', 'Giraffe', '<path d="M35 31V13m30 18V13" stroke="#828242" stroke-width="7"/><g fill="#727134"><circle cx="35" cy="12" r="6"/><circle cx="65" cy="12" r="6"/></g><path d="M29 38Q1 15 8 42l21 6m42-10Q99 15 92 42l-21 6" fill="#bcc54e"/><path d="M26 44q0-21 24-21t24 21v29q0 17-24 17T26 73z" fill="#dbe477"/><g fill="#929b3e" stroke="none"><path d="m42 24 12-1 5 10-13 5zM26 56l11 4-4 13-7-1m48-17-10 5 3 12 7-2"/></g>' + eyes + '<ellipse cx="50" cy="76" rx="24" ry="15" fill="#f5f4bb"/><path d="M39 73h1m20 0h1" stroke-width="5"/>'],
-    ['hippo', 'Hà mã', 'Hippo', ears('#b885b4') + roundHead('#d4a5d1') + eyes + '<rect x="21" y="54" width="58" height="34" rx="17" fill="#e4c1e0"/><path d="M35 79v9h9v-9m12 0v9h9v-9" fill="#fffef1"/><g fill="#885f85" stroke="none"><circle cx="35" cy="63" r="3"/><circle cx="65" cy="63" r="3"/></g><path d="M32 77q18 8 36 0" fill="none"/>'],
-    ['mouse', 'Chuột', 'Mouse', '<g fill="#b6a8af"><circle cx="23" cy="26" r="20"/><circle cx="77" cy="26" r="20"/></g><g fill="#f0b8c4" stroke="none"><circle cx="23" cy="26" r="12"/><circle cx="77" cy="26" r="12"/></g><path d="M19 52q0-27 31-27t31 27q0 20-31 38-31-18-31-38z" fill="#d8c8d1"/>' + eyes + '<path d="m45 73 5 6 5-6z" fill="#ed9cab"/><path d="m32 68-21-4m22 11-20 5m55-12 21-4m-22 11 20 5" fill="none"/>'],
-    ['frog', 'Ếch', 'Frog', '<g fill="#83cd56"><circle cx="28" cy="32" r="18"/><circle cx="72" cy="32" r="18"/><ellipse cx="50" cy="60" rx="40" ry="29"/></g><g fill="#fffde7"><circle cx="28" cy="33" r="11"/><circle cx="72" cy="33" r="11"/></g><g fill="#303c2e" stroke="none"><circle cx="29" cy="33" r="4"/><circle cx="71" cy="33" r="4"/></g><path d="M26 63q24 24 48 0" fill="#f4dfb3"/><path d="M38 53h1m22 0h1" stroke-width="3"/>'],
-    ['owl', 'Cú mèo', 'Owl', '<path d="M17 40 13 12l24 13q13-5 26 0l24-13-4 28q16 49-33 51T17 40z" fill="#9986dc"/><path d="M50 45Q20 13 16 54q-1 21 34 27 35-6 34-27-4-41-34-9z" fill="#e7dffc"/><g fill="white"><circle cx="32" cy="51" r="13"/><circle cx="68" cy="51" r="13"/></g><g fill="#37342e" stroke="none"><circle cx="34" cy="51" r="5"/><circle cx="66" cy="51" r="5"/></g><path d="m43 64 7 13 7-13z" fill="#eab248"/>'],
-    ['chick', 'Gà con', 'Chick', '<path d="M40 28Q22 1 43 12l9 10Q62 0 65 16l-3 14" fill="#f1c52e"/>' + roundHead('#ffe650') + eyes + '<path d="m36 65 14-9 14 9-14 13z" fill="#ed9742"/><path d="M38 65h24" fill="none"/>']
-  ];
-
-  const minimalEyes = '<g fill="#222" stroke="none"><circle cx="36" cy="51" r="3"/><circle cx="64" cy="51" r="3"/></g>';
-  const minimalNose = '<path d="m46 63 4 4 4-4z" fill="#222"/><path d="M50 67v5m-9 0q4 6 9 0 5 6 9 0" fill="none"/>';
-  const minimalHead = roundHead('white');
-  const minimalEars = ears('white');
-  const minimalDrawings = {
-    tiger: minimalEars + minimalHead + '<path d="M50 24v12m-6-6h12m-37 16 10 4m-9 10 9 2m52-16-10 4m9 10-9 2" fill="none"/>' + minimalEyes + minimalNose,
-    lion: '<path d="m50 7 12 6 14-1 5 13 11 9-5 14 5 15-12 9-6 15-15-1-9 8-11-8-14 1-6-14-11-10 5-15-5-14 11-9 5-13 14 1z" fill="white"/>' + minimalHead + minimalEyes + minimalNose,
-    pig: '<path d="M22 40Q4 8 14 10l27 17m18 0 27-17q10-2-8 30" fill="white"/>' + minimalHead + minimalEyes + '<ellipse cx="50" cy="68" rx="20" ry="14" fill="white"/><path d="M42 65v5m16-5v5" fill="none"/>',
-    dog: '<path d="M25 22Q4 19 8 61q9 13 18-8m49-31q21-3 17 39-9 13-18-8" fill="white"/>' + minimalHead + minimalEyes + minimalNose,
-    cat: '<path d="M18 46 14 10 41 28m18 0 27-18-4 36" fill="white"/>' + minimalHead + minimalEyes + minimalNose + '<path d="m30 62-18-4m18 12-18 4m58-12 18-4m-18 12 18 4" fill="none"/>',
-    rabbit: '<g fill="white"><ellipse cx="34" cy="28" rx="11" ry="25" transform="rotate(-12 34 28)"/><ellipse cx="66" cy="28" rx="11" ry="25" transform="rotate(12 66 28)"/><ellipse cx="50" cy="61" rx="32" ry="29"/></g><g transform="translate(0 7)">' + minimalEyes + '</g><path d="m47 69 3 3 3-3z" fill="#222"/><path d="M44 76q6 4 12 0m-10 2v7h8v-7m-4 0v7" fill="none"/>',
-    panda: minimalEars + minimalHead + '<g fill="none"><ellipse cx="34" cy="50" rx="11" ry="14" transform="rotate(25 34 50)"/><ellipse cx="66" cy="50" rx="11" ry="14" transform="rotate(-25 66 50)"/></g>' + minimalEyes + minimalNose,
-    penguin: '<path d="M16 64C16 34 27 10 50 10s34 24 34 54q0 25-34 25T16 64z" fill="white"/><path d="M50 41C24 13 20 49 23 65q2 19 27 19t27-19c3-16-1-52-27-24z" fill="none"/>' + minimalEyes + '<path d="m37 66 13-9 13 9-13 10z" fill="none"/><path d="M38 66h24" fill="none"/>',
-    fox: '<path d="M19 47 13 7 40 29h20L87 7l-6 40" fill="white"/><path d="M18 36Q50 20 82 36L89 62 50 89 11 62z" fill="white"/><path d="M16 54q22-5 34 24 12-29 34-24" fill="none"/>' + minimalEyes + '<path d="m46 77 4 4 4-4z" fill="#222"/>',
-    rhino: '<path d="M28 36Q10 28 14 10q20 1 23 24m26 0q3-23 23-24 4 18-14 26" fill="white"/><path d="M23 40q0-16 27-16t27 16l7 29q4 20-34 20T16 69z" fill="white"/><rect x="18" y="60" width="64" height="27" rx="12" fill="white"/>' + minimalEyes + '<path d="M39 66Q45 52 50 25q5 27 11 41Z" fill="white"/><path d="M30 70v3m40-3v3M38 81h24" fill="none"/>',
-    elephant: '<g fill="white"><ellipse cx="19" cy="51" rx="16" ry="28"/><ellipse cx="81" cy="51" rx="16" ry="28"/></g>' + minimalHead + minimalEyes + '<path d="M42 65v20q1 16 20 6l-4-10q-7 6-7-1V65" fill="white"/><path d="M37 67 30 79q9-1 9-9m24-3 7 12q-9-1-9-9" fill="white"/>',
-    monkey: '<g fill="white"><circle cx="15" cy="53" r="12"/><circle cx="85" cy="53" r="12"/></g>' + minimalHead + '<path d="M50 40C23 15 15 60 29 77q21 20 42 0c14-17 6-62-21-37z" fill="none"/>' + minimalEyes + '<path d="M46 61h8m-17 9q13 12 26 0" fill="none"/>',
-    cow: '<path d="M28 27 27 10q-15 5-9 22m54-5 1-17q15 5 9 22" fill="white"/><path d="M24 36Q0 24 5 46q8 10 21 3m50-13q24-12 19 10-8 10-21 3" fill="white"/>' + minimalHead + minimalEyes + '<ellipse cx="50" cy="72" rx="24" ry="15" fill="white"/><path d="M40 68v4m20-4v4" fill="none"/>',
-    sheep: '<path d="M28 42Q2 30 7 55l20 6m45-19q26-12 21 13l-20 6" fill="white"/><ellipse cx="50" cy="59" rx="28" ry="31" fill="white"/><path d="M20 41Q4 31 19 22q-1-17 18-13 13-12 26 0 19-4 18 13 15 9-1 19-8 8-18 0-12 9-24 0-10 8-18 0z" fill="white"/><g transform="translate(0 7)">' + minimalEyes + minimalNose + '</g>',
-    goat: '<path d="M28 34Q13 9 34 5l4 25m24 0 4-25q21 4 6 29" fill="white"/><path d="m40 77 10 19 10-19" fill="white"/><path d="M24 41 5 34q-2 21 19 18m52-11 19-7q2 21-19 18" fill="white"/>' + minimalHead + minimalEyes + minimalNose,
-    zebra: '<path d="M28 36Q15 3 29 8l15 25m12 0L71 8q14-5 1 28" fill="white"/><path d="M26 39q0-23 24-24t24 24v30q0 22-24 22T26 69z" fill="white"/><path d="M50 17v20m-23-2 11 7m35-7-11 7M26 54l11 5m37-5-11 5" fill="none"/>' + minimalEyes + '<ellipse cx="50" cy="75" rx="23" ry="15" fill="white"/><path d="M38 71v4m24-4v4" fill="none"/>',
-    giraffe: '<path d="M35 31V13m30 18V13" fill="none"/><g fill="white"><circle cx="35" cy="12" r="5"/><circle cx="65" cy="12" r="5"/></g><path d="M29 38Q1 15 8 42l21 6m42-10Q99 15 92 42l-21 6" fill="white"/><path d="M26 44q0-21 24-21t24 21v29q0 17-24 17T26 73z" fill="white"/><path d="m46 27 9 1-2 10-9-2z" fill="none"/>' + minimalEyes + '<ellipse cx="50" cy="76" rx="24" ry="15" fill="white"/><path d="M39 71v4m22-4v4" fill="none"/>',
-    hippo: minimalEars + minimalHead + minimalEyes + '<rect x="21" y="54" width="58" height="34" rx="17" fill="white"/><path d="M35 79v9h9v-9m12 0v9h9v-9" fill="white"/><path d="M35 61v4m30-4v4M32 77q18 8 36 0" fill="none"/>',
-    mouse: '<g fill="white"><circle cx="23" cy="26" r="20"/><circle cx="77" cy="26" r="20"/></g><path d="M19 52q0-27 31-27t31 27q0 20-31 38-31-18-31-38z" fill="white"/>' + minimalEyes + '<path d="m46 73 4 5 4-5z" fill="#222"/><path d="m32 68-21-4m22 11-20 5m55-12 21-4m-22 11 20 5" fill="none"/>',
-    frog: '<path d="M13 46C2 11 46 7 46 32h8C54 7 98 11 87 46 104 79 73 89 50 89S-4 79 13 46z" fill="white"/><g fill="white"><circle cx="28" cy="33" r="10"/><circle cx="72" cy="33" r="10"/></g><g fill="#222" stroke="none"><circle cx="29" cy="33" r="3"/><circle cx="71" cy="33" r="3"/></g><path d="M26 63q24 24 48 0" fill="none"/>',
-    owl: '<path d="M17 40 13 12l24 13q13-5 26 0l24-13-4 28q16 49-33 51T17 40z" fill="white"/><g fill="white"><circle cx="32" cy="51" r="14"/><circle cx="68" cy="51" r="14"/></g><g fill="#222" stroke="none"><circle cx="34" cy="51" r="4"/><circle cx="66" cy="51" r="4"/></g><path d="m43 69 7 11 7-11z" fill="none"/>',
-    chick: '<path d="M40 28Q22 1 43 12l9 10Q62 0 65 16l-3 14" fill="white"/>' + minimalHead + minimalEyes + '<path d="m36 65 14-9 14 9-14 13z" fill="none"/><path d="M38 65h24" fill="none"/>'
+  const ink = '#263238';
+  const palettes = {
+    tiger: ['#ffbc47', '#ffe9b2', '#ed8a31', '#69402a'],
+    lion: ['#ffdb61', '#fff1bd', '#f29438', '#69402a'],
+    pig: ['#ff9fbb', '#ffe0e8', '#ef7097', '#973954'],
+    dog: ['#e9b572', '#fff1d6', '#a96837', '#704527'],
+    cat: ['#66d5ed', '#ddf8ff', '#28a8cc', '#226b80'],
+    rabbit: ['#fff4eb', '#ffc2d4', '#f19aae', '#925261'],
+    panda: ['#ffffff', '#ffffff', '#35434d', '#35434d'],
+    penguin: ['#56a9dc', '#ffffff', '#ffbf42', '#286587'],
+    fox: ['#ff8b57', '#fff3dc', '#e96339', '#8b432c'],
+    rhino: ['#9cbed0', '#dcecf2', '#7a9eb6', '#4f7185'],
+    elephant: ['#86baf4', '#cbe5ff', '#649ce0', '#395e88'],
+    monkey: ['#be865c', '#ffe4b5', '#e5b77f', '#6f4934'],
+    cow: ['#fffef5', '#ffbdd0', '#efb75e', '#35434d'],
+    sheep: ['#fffdf1', '#d2bfe9', '#aa8fc7', '#69527e'],
+    goat: ['#f4dca7', '#fff5d9', '#b79a6e', '#806d4c'],
+    zebra: ['#ffffff', '#d9e3e9', '#35434d', '#35434d'],
+    deer: ['#dfad67', '#fff0cf', '#a17642', '#73512f'],
+    hippo: ['#c29aeb', '#e1c6fa', '#a67cd0', '#735095'],
+    mouse: ['#c5cdd4', '#ffcad6', '#9baab6', '#596a78'],
+    frog: ['#9bdb59', '#f5ffd9', '#6db83e', '#3e6b32'],
+    owl: ['#54c7be', '#efffde', '#ffca5d', '#287d79'],
+    chick: ['#ffe45f', '#fff4b9', '#ffa344', '#986022']
   };
 
-  window.AnimalFaces = Object.freeze(drawings.map(([id, vi, en, drawing], index) => Object.freeze({
+  const grayscalePalettes = {
+    tiger: ['#e6e6e6', '#ffffff', '#d4d4d4', '#8c8c8c'],
+    lion: ['#f2f2f2', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    pig: ['#f2f2f2', '#d4d4d4', '#bfbfbf', '#8c8c8c'],
+    dog: ['#e6e6e6', '#ffffff', '#a6a6a6', '#8c8c8c'],
+    cat: ['#d4d4d4', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    rabbit: ['#ffffff', '#e6e6e6', '#d4d4d4', '#8c8c8c'],
+    panda: ['#ffffff', '#ffffff', '#8c8c8c', '#8c8c8c'],
+    penguin: ['#bfbfbf', '#ffffff', '#d4d4d4', '#a6a6a6'],
+    fox: ['#bfbfbf', '#ffffff', '#a6a6a6', '#8c8c8c'],
+    rhino: ['#d4d4d4', '#f2f2f2', '#bfbfbf', '#8c8c8c'],
+    elephant: ['#e6e6e6', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    monkey: ['#bfbfbf', '#ffffff', '#d4d4d4', '#8c8c8c'],
+    cow: ['#ffffff', '#d4d4d4', '#bfbfbf', '#8c8c8c'],
+    sheep: ['#ffffff', '#d4d4d4', '#bfbfbf', '#8c8c8c'],
+    goat: ['#f2f2f2', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    zebra: ['#ffffff', '#bfbfbf', '#8c8c8c', '#808080'],
+    deer: ['#e6e6e6', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    hippo: ['#bfbfbf', '#e6e6e6', '#a6a6a6', '#8c8c8c'],
+    mouse: ['#e6e6e6', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    frog: ['#d4d4d4', '#ffffff', '#bfbfbf', '#8c8c8c'],
+    owl: ['#bfbfbf', '#ffffff', '#d4d4d4', '#8c8c8c'],
+    chick: ['#f2f2f2', '#ffffff', '#bfbfbf', '#8c8c8c']
+  };
+
+  function drawFace(id, mode) {
+    const [fur, light, accent, marking] = mode === 'color' ? palettes[id] : grayscalePalettes[id];
+    const outline = mode === 'color' ? ink : '#000000';
+    const colors = mode === 'minimal'
+      ? { fur: '#ffffff', light: '#ffffff', accent: '#ffffff', marking: '#ffffff',
+        paper: '#ffffff', ink: outline, eye: outline, glint: outline }
+      : { fur, light, accent, marking, paper: '#ffffff', ink: outline, eye: outline,
+        glint: mode === 'monochrome' ? outline : '#ffffff' };
+    const path = (shape, tone = 'fur', outlined = true) => `<path d="${shape}" fill="${tone === 'none' ? 'none' : colors[tone]}"${outlined ? '' : ' stroke="none"'}/>`;
+    const ellipse = (centerX, centerY, radiusX, radiusY, tone = 'fur', outlined = true) => `<ellipse cx="${centerX}" cy="${centerY}" rx="${radiusX}" ry="${radiusY}" fill="${colors[tone]}"${outlined ? '' : ' stroke="none"'}/>`;
+    const eyes = (left = 36, right = 64, height = 51, tone = 'eye') => ellipse(left, height, 3.1, 3.8, tone, false) + ellipse(right, height, 3.1, 3.8, tone, false);
+    const nose = (height = 66) => path(`M46 ${height}Q50 ${height - 2} 54 ${height}L50 ${height + 4}Z`, 'ink', false);
+    const smile = (height = 70) => path(`M50 ${height}v4m-9 0q4 6 9 0 5 6 9 0`, 'none');
+    const spots = (shape) => path(shape, 'marking', mode === 'minimal');
+    const roundEars = (left, right, height, radius, tone = 'fur') => ellipse(left, height, radius, radius, tone) + ellipse(right, height, radius, radius, tone);
+    let drawing;
+
+    switch (id) {
+      case 'tiger':
+        drawing = roundEars(25, 75, 26, 12)
+          + path('M18 49Q18 26 50 26T82 49V61Q82 87 50 87T18 61Z')
+          + spots('M44 27H56L50 41ZM19 46 32 51 18 55ZM81 46 68 51 82 55Z')
+          + ellipse(50, 70, 20, 13, 'light', false) + eyes() + nose() + smile();
+        break;
+      case 'lion':
+        drawing = path('M35 13Q50 3 65 13 81 10 84 27 97 35 89 50 98 64 84 74 82 91 65 88 50 99 35 88 18 91 16 74 2 64 11 50 3 35 16 27 19 10 35 13Z', 'accent')
+          + roundEars(28, 72, 32, 8)
+          + path('M25 49Q25 30 50 30T75 49V63Q75 82 50 82T25 63Z')
+          + ellipse(50, 67, 17, 12, 'light', false) + eyes(38, 62, 51) + nose(62) + smile(66);
+        break;
+      case 'pig':
+        drawing = path('M19 44 10 17Q25 12 38 29M62 29Q75 12 90 17L81 44')
+          + path('M17 54Q17 29 50 29T83 54V63Q83 87 50 87T17 63Z')
+          + path('M11 18 19 38 30 25M89 18 81 38 70 25', 'light')
+          + eyes(35, 65, 50) + ellipse(50, 69, 22, 15, 'light')
+          + ellipse(42, 68, 3, 4, 'ink', false) + ellipse(58, 68, 3, 4, 'ink', false);
+        break;
+      case 'dog':
+        drawing = path('M22 51Q22 25 50 25T78 51V63Q78 87 50 87T22 63Z')
+          + path('M28 28Q10 19 8 39L9 66Q19 76 26 61ZM72 28Q90 19 92 39L91 66Q81 76 74 61Z', 'accent')
+          + ellipse(50, 69, 18, 14, 'light', false) + eyes(37, 63, 50)
+          + path('M45 77V83Q50 90 55 83V77', 'light') + nose(62) + smile(66);
+        break;
+      case 'cat':
+        drawing = path('M18 46 17 13 38 28Q50 24 62 28L83 13 82 46Q89 84 50 87 11 84 18 46Z')
+          + path('M24 25 25 37 34 32M76 25 75 37 66 32', 'light')
+          + eyes(35, 65, 51) + nose(64) + smile(68)
+          + path('M28 64 9 60M28 72 10 76M72 64 91 60M72 72 90 76', 'none');
+        break;
+      case 'rabbit':
+        drawing = path('M25 46Q13 7 27 6 39 5 40 40M60 40Q61 5 73 6 87 7 75 46')
+          + path('M28 15 33 35M72 15 67 35', mode === 'color' ? 'light' : 'none')
+          + path('M21 61Q21 38 50 38T79 61Q83 88 50 91 17 88 21 61Z')
+          + eyes(36, 64, 61) + nose(72) + path('M43 80Q50 86 57 80', 'none');
+        break;
+      case 'panda':
+        drawing = roundEars(25, 75, 25, 13, 'marking')
+          + path('M17 51Q17 25 50 25T83 51V61Q83 87 50 87T17 61Z')
+          + path('M23 47Q28 35 40 41 48 47 39 60 28 67 23 57ZM77 47Q72 35 60 41 52 47 61 60 72 67 77 57Z', 'marking', mode === 'minimal')
+          + eyes(35, 65, 51, 'glint') + nose(67) + smile(71);
+        break;
+      case 'penguin':
+        drawing = path('M16 57Q16 17 50 17T84 57Q86 87 50 88 14 87 16 57Z', mode === 'color' ? 'fur' : 'marking')
+          + path('M50 43C31 19 23 42 23 60Q23 81 50 81T77 60C77 42 69 19 50 43Z', 'paper')
+          + eyes(36, 64, 52) + path('M37 66 50 58 63 66 50 76Z', 'accent')
+          + path('M38 66H62', 'none');
+        break;
+      case 'fox':
+        drawing = path('M17 44 12 9 39 29Q50 26 61 29L88 9 83 44 90 59Q75 75 50 89 25 75 10 59Z')
+          + path('M20 22 24 38 33 33M80 22 76 38 67 33', 'light')
+          + path('M12 58Q31 48 50 76 69 48 88 58 71 79 50 89 29 79 12 58Z', 'light')
+          + eyes(34, 66, 50) + nose(76);
+        break;
+      case 'rhino':
+        drawing = path('M24 39Q9 26 17 14 32 17 35 34M65 34Q68 17 83 14 91 26 76 39')
+          + path('M23 47Q22 28 50 28T77 47L84 69Q85 88 50 88T16 69Z')
+          + eyes(33, 67, 48)
+          + path('M23 61Q50 54 77 61L80 73Q80 85 50 85T20 73Z', 'light')
+          + path('M42 64Q48 52 57 35 57 54 63 65Z', 'paper')
+          + path('M30 69V72M70 69V72M41 79H59', 'none');
+        break;
+      case 'elephant':
+        drawing = path('M31 34C-2 12 0 79 21 78L35 65M69 34C102 12 100 79 79 78L65 65')
+          + path('M23 39Q10 31 12 57M77 39Q90 31 88 57', 'none')
+          + path('M25 49Q25 24 50 24T75 49V60Q75 76 59 78H41Q25 76 25 60Z')
+          + eyes(36, 64, 51)
+          + path('M42 65V81Q42 98 60 92 73 89 66 78L57 81Q61 86 54 85V65')
+          + path('M44 74H52', 'none');
+        break;
+      case 'monkey':
+        drawing = roundEars(16, 84, 52, 12, 'light')
+          + ellipse(50, 54, 32, 33)
+          + path('M50 42C31 23 24 43 28 58 16 76 39 87 50 84 61 87 84 76 72 58 76 43 69 23 50 42Z', 'light')
+          + eyes(37, 63, 52) + path('M47 63H53M36 71Q50 85 64 71', 'none');
+        break;
+      case 'cow':
+        drawing = path('M29 32Q15 27 23 10 26 23 37 24M71 32Q85 27 77 10 74 23 63 24', 'accent')
+          + path('M26 38Q8 26 5 39 9 53 26 48M74 38Q92 26 95 39 91 53 74 48')
+          + path('M27 47Q27 25 50 25T73 47L77 73H23Z')
+          + spots('M30 34Q44 22 46 37 47 46 38 47L28 45Z')
+          + eyes(36, 64, 52) + ellipse(50, 73, 29, 16, 'light')
+          + ellipse(39, 72, 3, 4, 'ink', false) + ellipse(61, 72, 3, 4, 'ink', false);
+        break;
+      case 'sheep':
+        drawing = path('M31 45Q9 35 7 49 14 63 29 55M69 45Q91 35 93 49 86 63 71 55', 'light')
+          + path('M28 43H72L68 70Q66 90 50 90T32 70Z', 'light')
+          + path('M19 40Q8 29 21 22 19 9 35 13 42 1 51 12 63 2 70 15 85 11 84 25 98 34 84 44 76 53 65 44 54 54 43 45 31 54 26 44 20 47 19 40Z')
+          + eyes(38, 62, 59) + nose(72) + smile(76);
+        break;
+      case 'goat':
+        drawing = path('M33 33Q16 13 34 6 27 17 42 28M67 33Q84 13 66 6 73 17 58 28', 'accent')
+          + path('M41 78 50 94 59 78', 'light')
+          + path('M29 41 7 33Q5 53 30 52M71 41 93 33Q95 53 70 52')
+          + path('M29 45Q28 27 50 27T71 45L64 71Q60 85 50 85T36 71Z')
+          + eyes(38, 62, 50) + nose(66) + smile(70);
+        break;
+      case 'zebra':
+        drawing = path('M28 35Q15 6 28 9L42 29M72 35Q85 6 72 9L58 29')
+          + path('M43 28 43 12Q50 6 57 12V28', 'marking')
+          + path('M27 45Q26 24 50 24T73 45V70Q73 90 50 90T27 70Z')
+          + spots('M44 25H56L54 32H46ZM28 35Q50 44 72 35L73 42Q50 51 27 42ZM27 56 39 61 27 65ZM73 56 61 61 73 65Z')
+          + eyes(39, 61, 51) + ellipse(50, 76, 23, 14, 'light')
+          + path('M40 73V76M60 73V76', 'none');
+        break;
+      case 'deer':
+        drawing = path('M35 43 29 32H18Q10 32 10 24V19H15V24Q15 27 20 27H25L21 18V7H26V16L31 25 34 20V10H39V22L34 31 42 43ZM65 43 71 32H82Q90 32 90 24V19H85V24Q85 27 80 27H75L79 18V7H74V16L69 25 66 20V10H61V22L66 31 58 43Z', 'accent')
+          + path('M33 49Q13 52 8 36 25 30 38 44ZM67 49Q87 52 92 36 75 30 62 44Z')
+          + path('M29 57Q29 41 50 41T71 57Q68 78 58 88 50 94 42 88 32 78 29 57Z')
+          + ellipse(50, 79, 14, 11, 'light', false)
+          + eyes(39, 61, 61) + nose(76) + smile(80);
+        break;
+      case 'hippo':
+        drawing = roundEars(25, 75, 24, 8)
+          + path('M22 51Q20 32 32 30 41 29 43 36H57Q59 29 68 30 80 32 78 51L83 68H17Z')
+          + eyes(33, 67, 43)
+          + path('M15 65Q14 51 30 53H70Q86 51 85 65V74Q85 89 68 89H32Q15 89 15 74Z', 'light')
+          + ellipse(30, 63, 3, 3, 'ink', false) + ellipse(70, 63, 3, 3, 'ink', false)
+          + path('M34 79V86H42V80M58 80V86H66V79', 'paper')
+          + path('M27 77Q50 84 73 77', 'none');
+        break;
+      case 'mouse':
+        drawing = roundEars(24, 76, 28, 19)
+          + roundEars(24, 76, 28, 11, 'light')
+          + path('M26 49Q29 31 50 31T74 49Q86 65 50 89 14 65 26 49Z')
+          + eyes(37, 63, 54) + nose(76)
+          + path('M31 68 12 64M32 75 14 80M69 68 88 64M68 75 86 80', 'none');
+        break;
+      case 'frog':
+        drawing = path('M12 47Q6 19 28 18 45 18 45 36H55Q55 18 72 18 94 19 88 47 99 83 50 86 1 83 12 47Z')
+          + ellipse(28, 37, 10, 12, 'paper') + ellipse(72, 37, 10, 12, 'paper')
+          + eyes(29, 71, 37) + path('M25 63Q50 85 75 63', 'none');
+        break;
+      case 'owl':
+        drawing = path('M17 43 13 16 35 28Q50 22 65 28L87 16 83 43Q94 87 50 90 6 87 17 43Z')
+          + ellipse(33, 52, 17, 19, 'light') + ellipse(67, 52, 17, 19, 'light')
+          + ellipse(34, 52, 5, 6, 'ink', false) + ellipse(66, 52, 5, 6, 'ink', false)
+          + path('M43 69 50 79 57 69Z', 'accent');
+        break;
+      case 'chick':
+        drawing = path('M39 29Q26 12 41 15L47 23Q49 6 57 12L57 24Q74 14 68 31')
+          + ellipse(50, 58, 34, 31) + eyes(36, 64, 53)
+          + path('M38 67 50 59 62 67 50 77Z', 'accent') + path('M39 67H61', 'none');
+        break;
+    }
+
+    return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g stroke="${mode === 'color' ? ink : '#000000'}" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">${drawing}</g></svg>`);
+  }
+
+  const animals = [
+    ['tiger', 'Hổ', 'Tiger'], ['lion', 'Sư tử', 'Lion'], ['pig', 'Lợn', 'Pig'],
+    ['dog', 'Chó', 'Dog'], ['cat', 'Mèo', 'Cat'], ['rabbit', 'Thỏ', 'Rabbit'],
+    ['panda', 'Gấu trúc', 'Panda'], ['penguin', 'Chim cánh cụt', 'Penguin'],
+    ['fox', 'Cáo', 'Fox'], ['rhino', 'Tê giác', 'Rhinoceros'], ['elephant', 'Voi', 'Elephant'],
+    ['monkey', 'Khỉ', 'Monkey'], ['cow', 'Bò', 'Cow'], ['sheep', 'Cừu', 'Sheep'],
+    ['goat', 'Dê', 'Goat'], ['zebra', 'Ngựa vằn', 'Zebra'], ['deer', 'Hươu', 'Deer'],
+    ['hippo', 'Hà mã', 'Hippo'], ['mouse', 'Chuột', 'Mouse'], ['frog', 'Ếch', 'Frog'],
+    ['owl', 'Cú mèo', 'Owl'], ['chick', 'Gà con', 'Chick']
+  ];
+
+  window.AnimalFaces = Object.freeze(animals.map(([id, vi, en], index) => Object.freeze({
     id, vi, en, code: String.fromCharCode(65 + index),
-    src: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g stroke="#403932" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">${drawing}</g></svg>`),
-    minimalSrc: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><g fill="white" stroke="#222" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${minimalDrawings[id]}</g></svg>`)
+    src: drawFace(id, 'color'),
+    monochromeSrc: drawFace(id, 'monochrome'),
+    minimalSrc: drawFace(id, 'minimal')
   })));
 })();

@@ -67,7 +67,9 @@
 
   function imageSource(code) {
     const face = animals.get(code);
-    return document.body.dataset.imageStyle === 'minimal' ? face.minimalSrc : face.src;
+    const style = document.body.dataset.imageStyle;
+    if (style === 'minimal') return face.minimalSrc;
+    return style === 'monochrome' ? face.monochromeSrc : face.src;
   }
 
   function applyImageStyle(style) {
@@ -171,6 +173,17 @@
     return { rows, cols, modes, directions, alphabet, lengths, minLength, maxLength };
   }
 
+  function canPlacePath(path, placements) {
+    const occupied = new Set(path.map(([row, col]) => `${row},${col}`));
+    return placements.every((placement) => {
+      let overlap = 0;
+      for (const [row, col] of placement.path) {
+        if (occupied.has(`${row},${col}`) && ++overlap > 1) return false;
+      }
+      return true;
+    });
+  }
+
   function createPuzzle(settings) {
     const { rows, cols, directions, alphabet, lengths, minLength, maxLength } = settings;
     const board = Array.from({ length: rows }, () => Array.from({ length: cols }, () => alphabet[Math.floor(Math.random() * alphabet.length)]));
@@ -187,20 +200,25 @@
             const path = pathBetween([row, col], [endRow, endCol]);
             const word = path.map(([pathRow, pathCol]) => board[pathRow][pathCol]).join('');
             const key = [word, [...word].reverse().join('')].sort()[0];
-            if (new Set(word).size > 1 && !candidates.has(key)) candidates.set(key, { word, path, key });
+            if (new Set(word).size <= 1) continue;
+            if (!candidates.has(key)) candidates.set(key, { word, path, key, paths: [] });
+            candidates.get(key).paths.push(path);
           }
         }
       }
       candidatesByLength.set(length, shuffle([...candidates.values()]));
     }
     const placements = [];
+    const answerPaths = [];
     const used = new Set();
     for (const length of lengths) {
       const choices = [length, ...shuffle([...candidatesByLength.keys()].filter((value) => value !== length))];
-      const candidate = choices.map((value) => candidatesByLength.get(value).find((entry) => !used.has(entry.key))).find(Boolean);
+      const candidate = choices.map((value) => candidatesByLength.get(value).find((entry) =>
+        !used.has(entry.key) && entry.paths.every((path) => canPlacePath(path, answerPaths)))).find(Boolean);
       if (!candidate) return null;
       used.add(candidate.key);
       placements.push({ word: candidate.word, path: candidate.path });
+      answerPaths.push(...candidate.paths.map((path) => ({ path })));
     }
     return { ...settings, words: placements.map((entry) => entry.word), board, placements, found: new Set() };
   }
