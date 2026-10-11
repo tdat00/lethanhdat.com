@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Tsubasa Vol. II - Super Striker | Password Generator</title>
+<link rel="stylesheet" href="captain-tsubasa-ii-super-striker.4b2407092f1d.css">
+</head>
+<body>
+
+<div class="page">
+  <header class="head">
+    <div class="head-row">
+      <div>
+        <h1>Captain Tsubasa Vol. II <span>Super Striker</span></h1>
+        <p class="jp" lang="ja">キャプテン翼II スーパーストライカー</p>
+      </div>
+      <div class="lang">
+        <span class="lang-label" id="lang-label">Game language</span>
+        <div class="dropdown">
+          <button type="button" class="dd-btn" id="lang-btn" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="lang-label lang-btn">
+            <span class="flag" data-flag="ja"></span><span class="dd-text"></span><span class="dd-caret" aria-hidden="true"></span>
+          </button>
+          <ul class="dd-list" id="lang-list" role="listbox" aria-labelledby="lang-label" tabindex="-1" hidden>
+            <li role="option" id="lang-opt-ja" data-value="ja"><span class="flag" data-flag="ja"></span><span class="dd-text">日本語</span></li>
+            <li role="option" id="lang-opt-en" data-value="en"><span class="flag" data-flag="en"></span><span class="dd-text">English</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p class="lead">Password generator for the NES/Famicom game. Continue from any round with custom player levels, experience and abilities. The password updates as you type.</p>
+  </header>
+
+  <div class="layout">
+
+    <section class="card output" aria-labelledby="h-pass">
+      <div class="out-body">
+        <div class="out-main">
+          <div class="out-head">
+            <h2 id="h-pass">Password</h2>
+          </div>
+          <div class="pass" id="pass" lang="ja" role="group" aria-label="Password"></div>
+          <div class="pass-bar">
+            <div class="rand-row">
+              <div class="split" id="rand-all">
+                <button type="button" class="btn split-main">Random Match</button>
+                <button type="button" class="btn split-toggle" aria-haspopup="menu" aria-expanded="false" aria-label="Toggle random match options"></button>
+                <ul class="dd-list split-menu" role="menu" aria-label="Random match options" hidden>
+                  <li role="menuitemradio" aria-checked="true" tabindex="-1" data-mode="balanced">Random Match</li>
+                  <li role="menuitemradio" aria-checked="false" tabindex="-1" data-mode="unbalanced">Random Match (unbalanced)</li>
+                </ul>
+              </div>
+              <span data-help="randomizeAll"></span>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn" id="prev" aria-label="Previous character">&lt;</button>
+              <span class="step" id="step" aria-live="polite">1 / 18</span>
+              <button type="button" class="btn" id="next" aria-label="Next character">&gt;</button>
+            </div>
+          </div>
+        </div>
+        <div class="out-keys">
+          <div class="out-head">
+            <h2 id="h-keys">Game input screen</h2>
+          </div>
+          <div class="keyboard" id="keyboard" lang="ja"></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="col-main">
+
+      <section class="card" aria-labelledby="h-match">
+        <div class="card-head">
+          <h2 id="h-match">Match</h2>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <div class="field-head">
+              <span class="label-line"><label for="round">Round</label><span data-help="round"></span></span>
+            </div>
+            <select class="select" id="round"></select>
+            <p class="warn" id="round-warn" hidden>The game has only 33 valid rounds (1&ndash;33). Higher rounds will glitch or hang the game.</p>
+          </div>
+
+          <div class="field">
+            <div class="field-head">
+              <span class="label-line"><label for="seed">Seed</label><span data-help="seed"></span></span>
+            </div>
+            <div id="random-slot"></div>
+          </div>
+        </div>
+
+        <div class="options">
+          <div class="option">
+            <input type="checkbox" id="cyclone">
+            <div class="option-text">
+              <span class="option-title"><label for="cyclone">Unlock Cyclone Shot</label></span>
+            </div>
+          </div>
+          <div class="option">
+            <input type="checkbox" id="drive">
+            <div class="option-text">
+              <span class="option-title"><label for="drive">Unlock Drive Overhead Shot</label></span>
+            </div>
+          </div>
+          <div class="option">
+            <input type="checkbox" id="guts">
+            <div class="option-text">
+              <span class="option-title"><label for="guts">Misugi's guts lower than 100</label><span data-help="guts"></span></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card players" id="players" data-team="sp" aria-labelledby="h-players">
+        <div class="card-head">
+          <span class="title-line"><h2 id="h-players">Player Groups</h2><span data-help="players"></span></span>
+          <div class="head-actions">
+            <div class="split" id="rand-groups">
+              <button type="button" class="btn split-main">Randomize</button>
+              <button type="button" class="btn split-toggle" aria-haspopup="menu" aria-expanded="false" aria-label="Toggle randomize options"></button>
+              <ul class="dd-list split-menu" role="menu" aria-label="Randomize options" hidden>
+                <li role="menuitemradio" aria-checked="true" tabindex="-1" data-mode="balanced">Randomize</li>
+                <li role="menuitemradio" aria-checked="false" tabindex="-1" data-mode="unbalanced">Randomize (unbalanced)</li>
+              </ul>
+            </div>
+            <span data-help="randomize"></span>
+          </div>
+        </div>
+        <div class="slots" id="slots"></div>
+      </section>
+
+    </div>
+  </div>
+
+  <p class="footer">
+    Rebuilt from the
+    <a href="https://cah4e3.shedevr.org.ru/cheatsbase_passg.php#249" target="_blank" rel="noopener noreferrer">password generator by cah4e3</a>
+    &middot; Algorithm info: Gennadiy_Master &middot; Runs entirely in your browser.
+  </p>
+</div>
+
+<script src="captain-tsubasa-ii-super-striker.cc610345ae7b.js"></script>
+</body>
+</html>
