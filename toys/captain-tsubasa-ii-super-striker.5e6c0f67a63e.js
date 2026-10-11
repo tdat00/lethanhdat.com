@@ -127,7 +127,7 @@
   const STORAGE_KEY = 'tsubasa2-password:v1';
 
   const defaults = () => ({
-    v: 3,
+    v: 4,
     levels: Array(10).fill(1),
     exps: Array(10).fill(0),
     round: 1,
@@ -136,9 +136,11 @@
     drive: false,
     guts: false,
     lang: 'ja',
-    randMode: 'balanced',
-    randAllMode: 'balanced'
+    randMode: 'round',
+    randAllMode: 'round'
   });
+
+  const RAND_MODES = ['round', 'unbalanced', 'random'];
 
   const clamp = (v, max) => {
     const n = Math.trunc(Number(v));
@@ -159,8 +161,11 @@
     s.drive = raw.drive === true;
     s.guts = raw.guts === true;
     s.lang = raw.lang === 'en' ? 'en' : 'ja';
-    s.randMode = raw.randMode === 'unbalanced' ? 'unbalanced' : 'balanced';
-    s.randAllMode = raw.randAllMode === 'unbalanced' ? 'unbalanced' : 'balanced';
+    // The round-based mode is the default; saves from before v4 only knew the other two modes.
+    if (raw.v >= 4) {
+      if (RAND_MODES.includes(raw.randMode)) s.randMode = raw.randMode;
+      if (RAND_MODES.includes(raw.randAllMode)) s.randAllMode = raw.randAllMode;
+    }
     return s;
   }
 
@@ -287,20 +292,37 @@
   });
 
   // ---------- Help tooltips ----------
+  // Help content is trusted static HTML (it is rendered with innerHTML below).
+  const randomModesHelp = (name, scope) => `<dl>
+      <dt>${name}</dt>
+      <dd>Levels suited to ${scope}: every level stays within 2 of the normal level for that round, which gives a balanced match.</dd>
+      <dt>${name} (unbalanced)</dt>
+      <dd>Each group gets its own random level. The range runs from the level that makes ${scope} hard to the level that makes it easy, plus 3 extra levels on each end, so groups can end up far apart.</dd>
+      <dt>${name} (true random)</dt>
+      <dd>Every level is picked independently, anywhere from the lowest to the highest level that fits ${scope}.</dd>
+    </dl>
+    <p class="tip-note">Choosing an option from the menu runs it and makes it the default for the main button.</p>`;
+
   const HELP = {
-    round: 'There are 33 valid rounds in this game (1\u201333), but the password system allows up to 64. Rounds 34 and above are listed as unofficial and will glitch or hang the game.',
-    guts: "Jun Misugi's guts test starts in round 17. If his guts drop below 100 after a round (win or lose), he will have zero guts in the next round. This option stores that state in the password.",
-    players: 'Each player group stores a single level shared by several characters, because the game has more characters across the teams than the password can hold. The characters shown follow the current round: rounds 1\u20136 and 13\u201316 show São Paulo players, 7\u201312 show Nankatsu players, and 17 onwards show Japan players. Names are shown in English; hover over a name, or switch the game language to Japanese, to see its kana.',
-    exp: "The players' current experience toward the next level, in steps of 0%, 25%, 50% and 75%.",
-    seed: 'A number from 0 to 63 that is mixed into the password to scramble its characters. It has no effect in the game: the same round, levels and abilities with a different seed produce a different but equally valid password.',
-    randomize: 'Randomize: gives every group a random Level and Exp, keeping all levels within 5 of each other.\nRandomize (unbalanced): the same, but levels can differ by up to 30.\nChoosing an option from the menu runs it and makes it the default for the main button.',
-    randomizeAll: "Random Match: randomizes the Round (1\u201333), the Seed, the Cyclone, Drive Overhead and Misugi's guts options, and the Level and Exp of every player group, keeping all levels within 5 of each other.\nRandom Match (unbalanced): the same, but levels can differ by up to 30.\nChoosing an option from the menu runs it and makes it the default for the main button."
+    round: `<p>There are <b>33 valid rounds</b> in this game (1\u201333), but the password system allows up to 64.</p>
+      <p class="tip-warn">Rounds 34 and above are listed as unofficial and will glitch or hang the game.</p>`,
+    guts: `<p>Jun Misugi's guts test starts in <b>round 17</b>.</p>
+      <p>If his guts drop below 100 after a round (win or lose), he will have <b>zero guts</b> in the next round. This option stores that state in the password.</p>`,
+    players: `<p>Each player group stores <b>one level</b> shared by several characters, because the game has more characters across the teams than the password can hold.</p>
+      <p>The characters shown follow the current round:</p>
+      <ul><li>Rounds 1\u20136 and 13\u201316: <b>São Paulo</b></li><li>Rounds 7\u201312: <b>Nankatsu</b></li><li>Round 17 onwards: <b>Japan</b></li></ul>
+      <p>Names are shown in English. Hover over a name, or switch the game language to Japanese, to see its kana.</p>`,
+    exp: `<p>The players' current experience toward the next level, in steps of <b>0%</b>, <b>25%</b>, <b>50%</b> and <b>75%</b>.</p>`,
+    seed: `<p>A number from <b>0 to 63</b> that is mixed into the password to scramble its characters.</p>
+      <p>It has no effect in the game: the same round, levels and abilities with a different seed produce a different but equally valid password.</p>`,
+    randomize: `<p>Gives every group a random <b>Level</b> and <b>Exp</b>.</p>${randomModesHelp('Randomize', 'the current round')}`,
+    randomizeAll: `<p>Randomizes the <b>Round</b> (1\u201333), the <b>Seed</b>, the Cyclone, Drive Overhead and Misugi's guts options, and the <b>Level</b> and <b>Exp</b> of every player group.</p>${randomModesHelp('Random match', 'the chosen round')}`
   };
 
   document.querySelectorAll('[data-help]').forEach((slot, n) => {
     const wrap = el('span', 'help-wrap');
     wrap.innerHTML = `<button type="button" class="help" aria-label="Help" aria-describedby="tip-${n}">?</button><span class="tip" id="tip-${n}" role="tooltip"></span>`;
-    wrap.querySelector('.tip').textContent = HELP[slot.dataset.help];
+    wrap.querySelector('.tip').innerHTML = HELP[slot.dataset.help];
     slot.replaceWith(wrap);
   });
 
@@ -502,18 +524,48 @@
   document.addEventListener('click', (e) => { if (!e.target.closest('.dropdown')) closeLang(false); });
 
   // ---------- Randomize split buttons ----------
-  const RAND_SPREAD = { balanced: 5, unbalanced: 30 };
+  const UNBALANCED_MARGIN = 3;
+  const ROUND_SPREAD = 2;
   const randInt = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
 
-  // Every group level lands within `spread` of the others; Exp is fully random.
-  function randomizeLevels(spread) {
-    const lowest = randInt(1, 64 - spread);
-    state.levels.forEach((_, i) => { state.levels[i] = lowest + randInt(0, spread); });
+  // [min, low, normal, high, max] levels for round N at ROUND_LEVELS[N - 1]. Low is a hard level (below the
+  // opponent), normal a balanced one and high an easy one (above it).
+  // Derivation of low/normal/high (min and max are not derived this way):
+  // 1. Opponent strength = mean of the six stats over the 10 outfield players (retro.ikumemo.net/games/captain-tsubasa-2/teams/).
+  // 2. Matching level = the level whose stats equal that, interpolating logarithmically through a regular player's
+  //    stats at levels 1, 20, 40 and 64 (8, 23, 68, 213). Round 33 (Brazil) gives about 39.7.
+  // 3. low, normal and high = 60%, 70% and 80% of it, rounded, so round 33 is 24, 28 and 32; then clamped to
+  //    min <= low <= normal <= high <= max (low < high).
+  const ROUND_LEVELS = [
+    [2, 2, 2, 3, 10], [1, 2, 2, 3, 10], [2, 3, 4, 4, 15], [3, 4, 5, 6, 15], [4, 5, 5, 6, 20], [4, 6, 7, 8, 20],
+    [1, 6, 7, 8, 20], [5, 7, 8, 9, 25], [5, 8, 9, 10, 25], [6, 9, 10, 12, 30], [6, 9, 10, 12, 30], [7, 9, 10, 12, 30],
+    [7, 10, 11, 13, 30], [8, 11, 13, 15, 30], [8, 10, 11, 13, 35], [9, 11, 12, 14, 35], [9, 14, 17, 19, 35],
+    [9, 15, 18, 20, 40], [10, 16, 19, 22, 40], [11, 17, 20, 22, 40], [11, 17, 20, 23, 45], [12, 17, 20, 23, 45],
+    [12, 14, 17, 19, 64], [13, 17, 20, 23, 50], [14, 19, 22, 25, 50], [14, 20, 23, 27, 50], [15, 21, 25, 28, 50],
+    [15, 23, 26, 30, 50], [15, 21, 25, 28, 64], [15, 23, 26, 30, 64], [15, 23, 27, 31, 64], [15, 23, 27, 31, 64],
+    [15, 24, 28, 32, 64]
+  ];
+
+  // Round mode: every level is within ROUND_SPREAD of the round's normal level. Unbalanced: each level anywhere from
+  // UNBALANCED_MARGIN below the round's low to UNBALANCED_MARGIN above its high. Random: each level anywhere from the
+  // round's min to max. Unofficial rounds reuse the last row. Exp is fully random.
+  function randomizeLevels(mode) {
+    const [min, low, normal, high, max] = ROUND_LEVELS[Math.min(state.round, MAX_VALID_ROUND) - 1];
+    let lowest = min;
+    let highest = max;
+    if (mode === 'round') {
+      lowest = Math.max(min, normal - ROUND_SPREAD);
+      highest = Math.min(max, normal + ROUND_SPREAD);
+    } else if (mode === 'unbalanced') {
+      lowest = Math.max(1, low - UNBALANCED_MARGIN);
+      highest = Math.min(64, high + UNBALANCED_MARGIN);
+    }
+    state.levels.forEach((_, i) => { state.levels[i] = randInt(lowest, highest); });
     state.exps.forEach((_, i) => { state.exps[i] = randInt(0, 3); });
   }
 
   function randomizeGroups() {
-    randomizeLevels(RAND_SPREAD[state.randMode]);
+    randomizeLevels(state.randMode);
     syncUI();
   }
 
@@ -522,7 +574,7 @@
     state.round = randInt(1, MAX_VALID_ROUND);
     state.random = randInt(0, 63);
     switches.forEach((key) => { state[key] = Math.random() < 0.5; });
-    randomizeLevels(RAND_SPREAD[state.randAllMode]);
+    randomizeLevels(state.randAllMode);
     syncUI();
   }
 

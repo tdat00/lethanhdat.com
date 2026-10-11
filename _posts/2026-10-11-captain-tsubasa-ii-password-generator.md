@@ -33,7 +33,7 @@ What you can do with it:
 - **Pick the round.** All 33 official rounds are listed with their opponents, from Fluminense in the opening round to Brazil in the World Cup final stage.
 - **Tune every player group.** Set the Level and Exp of each of the ten groups. The players shown follow the current round: São Paulo, Nankatsu or Japan.
 - **Unlock abilities.** Toggle the Cyclone Shot, the Drive Overhead Shot, and whether Misugi's guts are lower than 100.
-- **Roll the dice.** *Random Match* randomizes the whole setup, either balanced (levels within 5 of each other) or unbalanced (up to 30 apart).
+- **Roll the dice.** *Random match* randomizes the whole setup, with player levels suited to the chosen round. Two alternatives widen the range: unbalanced with each group getting its own random level between the round's hard and easy levels, plus 3 extra levels on each end, or true random with every level picked anywhere from the round's lowest to highest sensible level.
 - **Follow along in the game.** The password updates as you type, and the *Game input screen* highlights the exact key to press next. Use `<` and `>` to step through all 18 characters.
 - **Switch language.** The input screen can be shown in Japanese kana or in the English version's character set.
 

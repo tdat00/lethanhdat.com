@@ -9,6 +9,7 @@
   --accent: #2563eb;
   --on-accent: #ffffff;
   --danger: #b42318;
+  --tip-warn: #fbbf24;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --kana: "Yu Gothic UI", "Yu Gothic", Meiryo, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
   --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -27,6 +28,7 @@
     --accent: #6b9bff;
     --on-accent: #0b1020;
     --danger: #ff8a80;
+    --tip-warn: #b45309;
   }
 }
 
@@ -174,11 +176,19 @@ button { font: inherit; color: inherit; }
 }
 .help:hover, .help-wrap.open .help { color: var(--text); border-color: var(--muted); }
 .tip {
-  position: fixed; z-index: 40; width: max-content; max-width: min(300px, calc(100vw - 16px));
+  position: fixed; z-index: 40; width: max-content; max-width: min(340px, calc(100vw - 16px));
   padding: 10px 12px; border-radius: 8px; background: var(--text); color: var(--bg);
-  font: 400 13px/1.45 var(--sans); letter-spacing: 0; text-align: left; text-transform: none; white-space: pre-line;
+  font: 400 13px/1.45 var(--sans); letter-spacing: 0; text-align: left; text-transform: none;
   visibility: hidden; opacity: 0; pointer-events: none; transition: opacity 0.12s;
 }
+.tip > * + * { margin-top: 6px; }
+.tip b, .tip dt { font-weight: 650; }
+.tip ul { padding-left: 18px; }
+.tip dl { display: grid; gap: 2px; }
+.tip dt:not(:first-child) { margin-top: 8px; }
+.tip dd { opacity: 0.85; }
+.tip-warn { color: var(--tip-warn); font-weight: 600; }
+.tip-note { padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--bg) 30%, transparent); font-size: 12px; opacity: 0.7; }
 .help-wrap:hover .tip, .help-wrap.open .tip, .help-wrap:has(.help:focus-visible) .tip { visibility: visible; opacity: 1; }
 
 /* ---------- Output ---------- */
