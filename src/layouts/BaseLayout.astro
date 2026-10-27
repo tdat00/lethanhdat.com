@@ -1,0 +1,108 @@
+---
+import { ThemeProvider } from 'astro-pure/components/basic'
+
+import { localizedPath, locales, stripLocale, type Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import BaseHead from '@/components/BaseHead.astro'
+import Footer from '@/components/Footer.astro'
+import Header from '@/components/Header.astro'
+
+import '@/assets/styles/global.css'
+import '@/assets/styles/app.css'
+
+interface Props {
+  locale: Locale
+  meta: {
+    title: string
+    description?: string
+    ogImage?: string
+    article?: { publishedTime: string; modifiedTime: string; tags: string[] }
+  }
+  /** Address of this page in each locale it exists in. Defaults to the same path under every locale. */
+  alternates?: Partial<Record<Locale, string>>
+  highlightColor?: string
+}
+
+const { locale, meta, alternates: explicitAlternates, highlightColor, ...props } = Astro.props
+const t = useTranslations(locale)
+
+const alternates =
+  explicitAlternates ??
+  Object.fromEntries(
+    locales.map(({ code }) => [code, localizedPath(code, stripLocale(Astro.url.pathname))])
+  )
+---
+
+<html lang={locale}>
+  <head>
+    <BaseHead
+      title={meta.title}
+      description={meta.description ?? t.description}
+      ogImage={meta.ogImage}
+      article={meta.article}
+      {locale}
+      {alternates}
+    />
+    <ThemeProvider />
+  </head>
+
+  <body class='flex justify-center bg-background text-foreground' {...props}>
+    {
+      highlightColor && (
+        <div
+          id='highlight-gradient'
+          class='pointer-events-none absolute start-0 top-0 z-0 h-screen w-full opacity-25'
+          style={`background-image:linear-gradient(${highlightColor},transparent)`}
+        />
+      )
+    }
+    <div
+      id='main-container'
+      class='w-full max-w-[70rem] min-h-[100dvh] flex flex-col justify-between'
+    >
+      <Header {locale} {alternates} />
+      <div class='flex-1 w-full'>
+        <slot />
+      </div>
+      <Footer {locale} />
+    </div>
+
+    <style define:vars={{ highlightColor }}>
+      :global(.highlight) {
+        --highlight-fg: color-mix(
+          in srgb,
+          var(--highlightColor) 40%,
+          hsl(var(--foreground)/var(--un-text-opacity, 1))
+        );
+        color: var(--highlight-fg, hsl(var(--primary) / var(--un-text-opacity))) !important;
+      }
+      :global(.highlight-bg) {
+        background-color: var(
+          --highlightColor,
+          hsl(var(--primary) / var(--un-text-opacity))
+        ) !important;
+      }
+
+      /* Extend safe area for some special screens
+       * https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/env
+       */
+      #main-container {
+        padding-top: env(safe-area-inset-top);
+        padding-left: calc(1rem + env(safe-area-inset-left));
+        padding-right: calc(1rem + env(safe-area-inset-right));
+      }
+      @media (min-width: 640px) {
+        #main-container {
+          padding-left: calc(1.75rem + env(safe-area-inset-left));
+          padding-right: calc(1.75rem + env(safe-area-inset-right));
+        }
+      }
+      @media (min-width: 1024px) {
+        #main-container {
+          padding-left: calc(2.5rem + env(safe-area-inset-left));
+          padding-right: calc(2.5rem + env(safe-area-inset-right));
+        }
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,88 @@
+---
+import '@pagefind/default-ui/css/ui.css'
+
+import type { Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = useTranslations(locale)
+
+// The Pagefind UI shows English unless it is given its strings.
+const translations: Partial<Record<Locale, Record<string, string>>> = {
+  vi: {
+    placeholder: 'Tìm kiếm',
+    clear_search: 'Xóa',
+    load_more: 'Nhiều kết quả hơn',
+    search_label: 'Tìm kiếm trong trang này',
+    filters_label: 'Bộ lọc',
+    zero_results: 'Không tìm thấy kết quả cho [SEARCH_TERM]',
+    many_results: '[COUNT] kết quả cho [SEARCH_TERM]',
+    one_result: '[COUNT] kết quả cho [SEARCH_TERM]',
+    alt_search:
+      'Không tìm thấy kết quả cho [SEARCH_TERM]. Kiểm tra kết quả thay thế với [DIFFERENT_TERM]',
+    search_suggestion: 'Không tìm thấy kết quả cho [SEARCH_TERM]. Thử một trong các tìm kiếm:',
+    searching: 'Đang tìm kiếm cho [SEARCH_TERM]...'
+  }
+}
+---
+
+<site-search data-translations={JSON.stringify(translations[locale] ?? {})}>
+  <aside class='form my-4'>
+    {
+      import.meta.env.DEV ? (
+        <div class='w-full rounded-xl border-2 bg-transparent px-4 py-2 pe-3 outline-none focus:border-foreground'>
+          {t.searchDisabledInDev}
+        </div>
+      ) : (
+        <div id='site-search' />
+      )
+    }
+  </aside>
+</site-search>
+
+<script>
+  class SiteSearch extends HTMLElement {
+    constructor() {
+      super()
+      window.addEventListener('DOMContentLoaded', () => {
+        // The search index only exists in a production build.
+        if (import.meta.env.DEV) return
+        const onIdle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1))
+        onIdle(async () => {
+          // @ts-expect-error — Missing types for @pagefind/default-ui package.
+          const { PagefindUI } = await import('@pagefind/default-ui')
+          // Pagefind indexes each page under its <html lang> and searches only that language.
+          new PagefindUI({
+            element: '#site-search',
+            baseUrl: import.meta.env.BASE_URL,
+            bundlePath: `${import.meta.env.BASE_URL.replace(/\/$/, '')}/pagefind/`,
+            showImages: false,
+            showSubResults: true,
+            translations: JSON.parse(this.dataset.translations ?? '{}')
+          })
+        })
+      })
+    }
+  }
+  customElements.define('site-search', SiteSearch)
+</script>
+
+<style>
+  #site-search {
+    --pagefind-ui-scale: 0.8;
+    --pagefind-ui-primary: hsl(var(--primary) / var(--un-bg-opacity, 1));
+    --pagefind-ui-text: hsl(var(--foreground) / var(--un-text-opacity, 1));
+    --pagefind-ui-background: hsl(var(--muted) / var(--un-bg-opacity, 1));
+    --pagefind-ui-border: hsl(var(--border) / var(--un-border-opacity, 1));
+    --pagefind-ui-tag: hsl(var(--muted-foreground) / var(--un-text-opacity, 1));
+    --pagefind-ui-border-width: 2px;
+    --pagefind-ui-border-radius: calc(var(--radius) + 2px);
+    --pagefind-ui-image-border-radius: calc(var(--radius) + 2px);
+    --pagefind-ui-image-box-ratio: 3 / 2;
+    --pagefind-ui-font: sans-serif;
+  }
+</style>

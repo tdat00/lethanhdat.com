@@ -1,0 +1,81 @@
+---
+import type { Page } from 'astro'
+
+import { Paginator } from 'astro-pure/components/pages'
+import { Button, Icon } from 'astro-pure/user'
+
+import { localizedPath, type Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import PostPreview from '@/components/PostPreview.astro'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { tagUrl, type Post } from '@/utils/content'
+
+interface Props {
+  locale: Locale
+  page: Page<Post>
+  tags: string[]
+  total: number
+}
+
+const { locale, page, tags, total } = Astro.props
+const t = useTranslations(locale)
+
+const paginationProps = {
+  ...(page.url.prev && { prevUrl: { text: t.previousPosts, url: page.url.prev } }),
+  ...(page.url.next && { nextUrl: { text: t.nextPosts, url: page.url.next } })
+}
+---
+
+<PageLayout {locale} meta={{ title: t.blog, description: t.blogDescription }}>
+  <Button title={t.back} href={localizedPath(locale, '/')} variant='back' />
+  <main class='mt-6 lg:mt-10'>
+    <div id='content-header' class='animate'>
+      <h1 class='mb-6 mt-6 text-3xl font-medium sm:mt-10'>{t.blog}</h1>
+    </div>
+    {
+      page.data.length === 0 ? (
+        <p>{t.noPosts}</p>
+      ) : (
+        <div class='grid gap-y-16 sm:grid-cols-[3fr_1fr] sm:gap-x-8'>
+          <section aria-label={t.blog} class='animate' id='content'>
+            <div class='mb-3 flex flex-col justify-between text-sm sm:mb-5 sm:flex-row'>
+              <span class='text-muted-foreground'>
+                {t.pageSummary(page.currentPage, page.data.length, total)}
+              </span>
+              <a href={localizedPath(locale, '/archives')} data-astro-prefetch>
+                {t.viewByYear}
+              </a>
+            </div>
+            <ul class='flex flex-col gap-y-4 text-start'>
+              {page.data.map((post) => (
+                <PostPreview {post} {locale} detailed />
+              ))}
+            </ul>
+            <Paginator {...paginationProps} />
+          </section>
+
+          {!!tags.length && (
+            <aside class='animate' id='sidebar'>
+              <h2 class='mb-4 flex items-center text-lg font-medium'>
+                <Icon name='tag-2' class='me-2' />
+                {t.tags}
+              </h2>
+              <ul class='text-bgColor flex flex-wrap gap-2'>
+                {tags.slice(0, 50).map((tag) => (
+                  <li>
+                    <Button title={tag} href={tagUrl(locale, tag)} variant='pill' />
+                  </li>
+                ))}
+              </ul>
+              <span class='mt-4 block sm:text-end'>
+                <a href={localizedPath(locale, '/tags')} data-astro-prefetch>
+                  {t.viewAll}
+                </a>
+              </span>
+            </aside>
+          )}
+        </div>
+      )
+    }
+  </main>
+</PageLayout>

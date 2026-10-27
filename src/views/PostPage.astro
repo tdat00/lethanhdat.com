@@ -1,0 +1,25 @@
+---
+import { render } from 'astro:content'
+
+import type { Locale } from '@/i18n/config'
+import PostLayout from '@/layouts/BlogPost.astro'
+import { getTranslations, postSlug, postUrl, type Post } from '@/utils/content'
+
+interface Props {
+  locale: Locale
+  post: Post
+  posts: Post[]
+}
+
+const { locale, post, posts } = Astro.props
+
+const translations = await getTranslations(post)
+const alternates = Object.fromEntries(
+  Object.keys(translations).map((code) => [code, postUrl(code as Locale, postSlug(post))])
+)
+const { Content, headings, remarkPluginFrontmatter } = await render(post)
+---
+
+<PostLayout {locale} {post} {posts} {alternates} {headings} {remarkPluginFrontmatter}>
+  <Content />
+</PostLayout>

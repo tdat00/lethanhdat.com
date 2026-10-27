@@ -1,0 +1,14 @@
+---
+import type { GetStaticPathsOptions } from 'astro'
+
+import { tagPaths } from '@/utils/paths'
+import TagPosts from '@/views/TagPosts.astro'
+
+export function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  return tagPaths(paginate, 'vi')
+}
+
+const { page, tag } = Astro.props
+---
+
+<TagPosts locale='vi' {tag} {page} />

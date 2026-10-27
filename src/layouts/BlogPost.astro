@@ -1,0 +1,54 @@
+---
+import type { MarkdownHeading } from 'astro'
+
+import { MediumZoom } from 'astro-pure/advanced'
+
+import { localizedPath, type Locale } from '@/i18n/config'
+import ArticleNav from '@/components/ArticleNav.astro'
+import Hero from '@/components/Hero.astro'
+import TOC from '@/components/TOC.astro'
+import PageLayout from '@/layouts/ContentLayout.astro'
+import { integ } from '@/site-config'
+import type { Post } from '@/utils/content'
+
+interface Props {
+  post: Post
+  /** All posts of the locale, newest first. */
+  posts: Post[]
+  locale: Locale
+  alternates: Partial<Record<Locale, string>>
+  headings: MarkdownHeading[]
+  remarkPluginFrontmatter: Record<string, unknown>
+}
+
+const { post, posts, locale, alternates, headings, remarkPluginFrontmatter } = Astro.props
+const { title, description, ogImage, publishDate, updatedDate, tags } = post.data
+---
+
+<PageLayout
+  {locale}
+  {alternates}
+  meta={{
+    title,
+    description,
+    ogImage,
+    article: {
+      publishedTime: publishDate.toISOString(),
+      modifiedTime: (updatedDate ?? publishDate).toISOString(),
+      tags
+    }
+  }}
+  back={localizedPath(locale, '/blog')}
+>
+  {!!headings.length && <TOC {headings} {locale} slot='sidebar' />}
+
+  <Hero {post} {locale} words={remarkPluginFrontmatter.words} slot='header' />
+
+  <slot />
+
+  <Fragment slot='bottom'>
+    <ArticleNav {post} {posts} {locale} class='mt-3 sm:mt-6' />
+  </Fragment>
+</PageLayout>
+
+{integ.mediumZoom?.enable && <MediumZoom />}

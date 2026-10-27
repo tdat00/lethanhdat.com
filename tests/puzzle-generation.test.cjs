@@ -5,7 +5,7 @@ const { test } = require('node:test');
 const vm = require('node:vm');
 
 function loadAnimalFaces() {
-  const directory = path.join(__dirname, '..', 'toys');
+  const directory = path.join(__dirname, '..', 'public', 'toys');
   const html = readFileSync(path.join(directory, 'animal-search-puzzle.html'), 'utf8');
   const script = html.match(/src="(animal-faces(?:\.[a-f0-9]+)?\.js)"/)[1];
   const context = { window: {} };
@@ -72,7 +72,7 @@ test('animal artwork: all faces have two level, centered eyes in frontal view', 
 });
 
 function loadGenerator(name, seed = 1) {
-  const directory = path.join(__dirname, '..', 'toys');
+  const directory = path.join(__dirname, '..', 'public', 'toys');
   const html = readFileSync(path.join(directory, `${name}-search-puzzle.html`), 'utf8');
   const script = html.match(new RegExp(`src="(${name}-search-puzzle\\.[a-f0-9]+\\.js)"`))[1];
   const source = readFileSync(path.join(directory, script), 'utf8');

@@ -1,0 +1,81 @@
+---
+import { Button, Icon, Label } from 'astro-pure/user'
+
+import type { Locale } from '@/i18n/config'
+import { localizedPath } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import PostPreview from '@/components/PostPreview.astro'
+import Section from '@/components/Section.astro'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import config, { profile } from '@/site-config'
+import { getPosts } from '@/utils/content'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = useTranslations(locale)
+const posts = (await getPosts(locale)).slice(0, 10)
+---
+
+<PageLayout {locale} meta={{ title: config.title }} highlightColor='#659EB9'>
+  <main class='flex w-full flex-col items-center'>
+    <section class='animate mb-10 flex flex-col items-center gap-y-7' id='content-header'>
+      <img
+        src={config.logo.src}
+        alt={config.logo.alt}
+        width='112'
+        height='112'
+        class='size-28 rounded-full border p-1'
+        loading='eager'
+        fetchpriority='high'
+      />
+
+      <div class='flex flex-col items-center gap-y-4'>
+        <h1 class='text-3xl font-medium'>{profile.name}</h1>
+        <p class='text-muted-foreground'>{t.tagline}</p>
+        <div class='flex flex-wrap justify-center gap-x-7 gap-y-3'>
+          <Label title={t.github} as='a' href={profile.github} target='_blank' rel='noopener'>
+            <Icon name='github' class='size-5' slot='icon' />
+          </Label>
+          <Label title={t.email} as='a' href={`mailto:${profile.email}`}>
+            <Icon name='email' class='size-5' slot='icon' />
+          </Label>
+        </div>
+      </div>
+    </section>
+
+    <div id='content' class='animate flex flex-col gap-y-10 md:w-4/5 lg:w-5/6'>
+      {
+        posts.length > 0 && (
+          <Section title={t.recentPosts}>
+            <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
+              {posts.map((post) => (
+                <PostPreview {post} {locale} />
+              ))}
+            </ul>
+            <Button
+              title={t.morePosts}
+              class='w-fit self-end'
+              href={localizedPath(locale, '/blog')}
+              variant='ahead'
+            />
+          </Section>
+        )
+      }
+
+      <Section title={t.links}>
+        <ul class='flex flex-wrap gap-3'>
+          {
+            profile.links.map(({ title, href }) => (
+              <li>
+                <Button title={title} {href} target='_blank' variant='pill' />
+              </li>
+            ))
+          }
+        </ul>
+      </Section>
+    </div>
+  </main>
+</PageLayout>

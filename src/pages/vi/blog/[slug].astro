@@ -1,0 +1,12 @@
+---
+import { postPaths } from '@/utils/paths'
+import PostPage from '@/views/PostPage.astro'
+
+export function getStaticPaths() {
+  return postPaths('vi')
+}
+
+const { post, posts } = Astro.props
+---
+
+<PostPage locale='vi' {post} {posts} />

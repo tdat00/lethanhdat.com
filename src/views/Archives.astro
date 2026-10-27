@@ -1,0 +1,51 @@
+---
+import { Button } from 'astro-pure/user'
+
+import { localizedPath, type Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import PostPreview from '@/components/PostPreview.astro'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { getPosts, groupByYear } from '@/utils/content'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = useTranslations(locale)
+const posts = await getPosts(locale)
+const postsByYear = groupByYear(posts)
+---
+
+<PageLayout {locale} meta={{ title: t.archives, description: t.archivesDescription }}>
+  <Button title={t.back} href={localizedPath(locale, '/blog')} variant='back' />
+
+  <main class='mt-6 lg:mt-10'>
+    <div id='content-header' class='animate'>
+      <h1 class='mb-6 text-3xl font-medium'>{t.archives}</h1>
+    </div>
+
+    {posts.length === 0 && <p>{t.noPosts}</p>}
+
+    <section id='content' class='animate' aria-label={t.archives}>
+      {
+        postsByYear.map(([year, yearPosts]) => (
+          <div class='relative mt-20'>
+            <h2
+              class='absolute -start-6 -top-16 z-0 text-9xl font-bold text-transparent opacity-12 dark:opacity-25'
+              style='-webkit-text-stroke-width:2px;-webkit-text-stroke-color:hsl(var(--foreground)/var(--un-text-opacity, 1))'
+            >
+              <samp>{year}</samp>
+            </h2>
+            <p class='px-5 text-muted-foreground'>{t.postCount(yearPosts.length)}</p>
+            <ul class='flex flex-col text-start'>
+              {yearPosts.map((post) => (
+                <PostPreview {post} {locale} class='border-0 bg-transparent py-2' />
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+  </main>
+</PageLayout>

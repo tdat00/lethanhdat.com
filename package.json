@@ -1,0 +1,24 @@
+{
+  "name": "lethanhdat.com",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro",
+    "test": "node --test tests"
+  },
+  "dependencies": {
+    "@astrojs/check": "0.9.9",
+    "@astrojs/rss": "4.0.18",
+    "@astrojs/sitemap": "3.7.2",
+    "@pagefind/default-ui": "^1.5.2",
+    "astro": "6.4.8",
+    "astro-pure": "1.4.9",
+    "sharp": "^0.34.5",
+    "typescript": "^6.0.3",
+    "unocss": "^66.10.5"
+  }
+}

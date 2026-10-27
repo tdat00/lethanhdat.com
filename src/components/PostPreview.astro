@@ -1,0 +1,122 @@
+---
+import { Button, Icon } from 'astro-pure/user'
+import { cn } from 'astro-pure/utils'
+import { render } from 'astro:content'
+
+import { useTranslations } from '@/i18n/ui'
+import type { Locale } from '@/i18n/config'
+import {
+  formatDate,
+  postSlug,
+  postUrl,
+  readingMinutes,
+  tagUrl,
+  type Post
+} from '@/utils/content'
+
+type Props = {
+  post: Post
+  locale: Locale
+  detailed?: boolean
+  class?: string
+}
+
+const { post, locale, detailed = false, class: className } = Astro.props
+const { data } = post
+const t = useTranslations(locale)
+
+const { remarkPluginFrontmatter } = detailed
+  ? await render(post)
+  : { remarkPluginFrontmatter: {} as Record<string, unknown> }
+---
+
+<li class={cn('post-preview', className)}>
+  <a
+    class={cn(
+      'block w-full relative group rounded-2xl border bg-background transition-colors ease-in-out px-5 py-2.5 hover:bg-muted hover:text-primary',
+      detailed && 'max-sm:px-4 sm:py-5'
+    )}
+    href={postUrl(locale, postSlug(post))}
+    data-astro-prefetch
+  >
+    <div class={cn('relative flex flex-col gap-1', !detailed && 'sm:flex-row sm:items-center')}>
+      <time
+        class='min-w-[95px] font-mono text-xs text-muted-foreground'
+        datetime={data.publishDate.toISOString()}
+      >
+        {formatDate(data.publishDate, locale)}
+      </time>
+
+      <div class='flex justify-between flex-grow'>
+        <div class={cn(detailed && 'font-medium')}>
+          {data.pin && <span class='text-primary me-1'>[Pin]</span>}
+          {data.draft && <span class='text-red-500 me-1'>(Draft)</span>}
+          {data.title}
+        </div>
+        <svg
+          xmlns='http://www.w3.org/2000/svg'
+          width='16'
+          height='16'
+          viewBox='0 0 24 24'
+          fill='none'
+          stroke-width='2.5'
+          stroke-linecap='round'
+          stroke-linejoin='round'
+          class='preview-redirect my-1 stroke-muted-foreground group-hover:stroke-primary'
+          ><line
+            x1='5'
+            y1='12'
+            x2='19'
+            y2='12'
+            class='translate-x-4 scale-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1 group-hover:scale-x-100'
+          ></line><polyline
+            points='12 5 19 12 12 19'
+            class='translate-x-0 transition-all duration-300 ease-in-out group-hover:translate-x-1'
+          ></polyline></svg
+        >
+      </div>
+      {
+        detailed && (
+          <>
+            <p class='line-clamp-2 text-sm text-muted-foreground sm:line-clamp-3'>
+              {data.description}
+            </p>
+            <div class='py-2 flex items-center gap-2 text-sm italic leading-4 text-muted-foreground'>
+              <span class='flex items-center gap-1'>
+                <Icon name='time' class='size-4' />
+                {t.readingTime(readingMinutes(remarkPluginFrontmatter.words))}
+              </span>
+            </div>
+            {data.tags.length > 0 && (
+              <object title={t.tags} aria-label={t.tags}>
+                <ul class='tag-list mt-1 flex flex-wrap gap-2'>
+                  {data.tags.map((tag) => (
+                    <li>
+                      <Button as='a' title={tag} href={tagUrl(locale, tag)} variant='pill' />
+                    </li>
+                  ))}
+                </ul>
+              </object>
+            )}
+          </>
+        )
+      }
+    </div>
+  </a>
+
+  <style>
+    .post-preview:hover {
+      & > a,
+      & .tag-list a {
+        background-color: hsl(var(--muted) / var(--un-bg-opacity, 1)) !important;
+      }
+      & > a,
+      & .tag-list a:hover {
+        color: hsl(var(--primary) / var(--un-text-opacity, 1)) !important;
+      }
+      & > a .preview-redirect {
+        stroke: hsl(var(--primary) / var(--un-text-opacity, 1)) !important;
+      }
+    }
+  </style>
+</li>

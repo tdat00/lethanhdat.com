@@ -1,0 +1,132 @@
+---
+import { Font } from 'astro:assets'
+import config from 'virtual:config'
+
+import { getLocaleInfo, localizedPath, locales, type Locale } from '@/i18n/config'
+
+interface Article {
+  publishedTime: string
+  modifiedTime: string
+  tags: string[]
+}
+
+interface Props {
+  title: string
+  description: string
+  locale: Locale
+  /** Social card, as a path under `public/`. */
+  ogImage?: string
+  article?: Article
+  /** Address of this page in each locale it exists in. */
+  alternates?: Partial<Record<Locale, string>>
+}
+
+const { title, description, locale, ogImage, article, alternates } = Astro.props
+
+const siteTitle = title === config.title ? title : `${title} ${config.titleDelimiter} ${config.title}`
+const canonicalURL = new URL(Astro.url.pathname, Astro.site)
+const socialImageURL = new URL(ogImage ?? config.socialCard, Astro.site).href
+const localeInfo = getLocaleInfo(locale)
+
+const translations = Object.entries(alternates ?? {}).map(([code, path]) => ({
+  info: getLocaleInfo(code as Locale),
+  url: new URL(path, Astro.site).href
+}))
+const defaultTranslation = translations.find(({ info }) => info.code === 'en')
+
+const structuredData = article && {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  mainEntityOfPage: { '@type': 'WebPage', '@id': canonicalURL.href },
+  headline: title,
+  description,
+  image: socialImageURL,
+  datePublished: article.publishedTime,
+  dateModified: article.modifiedTime,
+  inLanguage: locale,
+  author: { '@type': 'Person', name: config.author },
+  keywords: article.tags.join(', ')
+}
+---
+
+<meta charset='utf-8' />
+<meta
+  content='width=device-width, initial-scale=1.0, shrink-to-fit=no, viewport-fit=cover'
+  name='viewport'
+/>
+<meta content='IE=edge' http-equiv='X-UA-Compatible' />
+<title>{siteTitle}</title>
+
+<link rel='icon' type={config.favicon.type} href={config.favicon.href} />
+<link rel='shortcut icon' type={config.favicon.type} href={config.favicon.href} />
+
+<Font cssVariable='--font-inter' preload={[{ subset: 'latin', style: 'normal' }]} />
+<style>
+  body {
+    font-family: var(--font-inter);
+  }
+</style>
+
+<link rel='canonical' href={canonicalURL} />
+{
+  translations.map(({ info, url }) => (
+    <link rel='alternate' hreflang={info.hreflang} href={url} />
+  ))
+}
+{defaultTranslation && <link rel='alternate' hreflang='x-default' href={defaultTranslation.url} />}
+
+<meta content={siteTitle} name='title' />
+<meta content={description} name='description' />
+<meta content={config.author} name='author' />
+<meta name='color-scheme' content='light dark' />
+
+{/* Open Graph / Facebook */}
+<meta content={article ? 'article' : 'website'} property='og:type' />
+<meta content={title} property='og:title' />
+<meta content={description} property='og:description' />
+<meta content={canonicalURL} property='og:url' />
+<meta content={config.title} property='og:site_name' />
+<meta content={localeInfo.ogLocale} property='og:locale' />
+{
+  translations
+    .filter(({ info }) => info.code !== locale)
+    .map(({ info }) => <meta content={info.ogLocale} property='og:locale:alternate' />)
+}
+<meta content={socialImageURL} property='og:image' />
+<meta content='1730425486970212' property='fb:app_id' />
+{
+  article && (
+    <>
+      <meta content={config.author} property='article:author' />
+      <meta content={article.publishedTime} property='article:published_time' />
+      <meta content={article.modifiedTime} property='article:modified_time' />
+      {article.tags.map((tag) => (
+        <meta content={tag} property='article:tag' />
+      ))}
+    </>
+  )
+}
+
+{/* Twitter */}
+<meta content='summary_large_image' name='twitter:card' />
+<meta content={title} name='twitter:title' />
+<meta content={description} name='twitter:description' />
+<meta content={socialImageURL} name='twitter:image' />
+<meta content='@tdat00' name='twitter:site' />
+<meta content='@tdat00' name='twitter:creator' />
+
+<link href='/sitemap-index.xml' rel='sitemap' />
+{
+  locales.map(({ code, label }) => (
+    <link
+      rel='alternate'
+      type='application/rss+xml'
+      title={`${config.title} (${label})`}
+      href={new URL(localizedPath(code, '/rss.xml'), Astro.site).href}
+    />
+  ))
+}
+
+<meta content={Astro.generator} name='generator' />
+
+{structuredData && <script type='application/ld+json' set:html={JSON.stringify(structuredData)} />}

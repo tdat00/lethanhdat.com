@@ -1,0 +1,14 @@
+---
+import type { GetStaticPathsOptions } from 'astro'
+
+import { blogListPaths } from '@/utils/paths'
+import BlogList from '@/views/BlogList.astro'
+
+export function getStaticPaths({ paginate }: GetStaticPathsOptions) {
+  return blogListPaths(paginate, 'en')
+}
+
+const { page, tags, total } = Astro.props
+---
+
+<BlogList locale='en' {page} {tags} {total} />

@@ -1,0 +1,52 @@
+---
+import { Button } from 'astro-pure/user'
+import { cn } from 'astro-pure/utils'
+
+import { localizedPath, type Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { getPosts, getTagCounts, tagUrl } from '@/utils/content'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = useTranslations(locale)
+const tags = getTagCounts(await getPosts(locale))
+---
+
+<PageLayout {locale} meta={{ title: t.tags, description: t.tagsDescription }}>
+  <Button title={t.back} href={localizedPath(locale, '/blog')} variant='back' />
+  <main class='mt-6 lg:mt-10'>
+    <div id='content-header' class='animate'>
+      <h1 class='mb-6 text-3xl font-medium'>{t.tags}</h1>
+    </div>
+
+    <div id='content' class='animate'>
+      {
+        tags.length > 0 ? (
+          <ul class='flex flex-wrap gap-4'>
+            {tags.map(([tag, count]) => (
+              <li>
+                <Button
+                  href={tagUrl(locale, tag)}
+                  variant='pill'
+                  class={cn(
+                    'items-start gap-x-1',
+                    count > 2 ? 'rounded-xl px-3 py-1 text-xl' : count > 1 && 'text-lg'
+                  )}
+                >
+                  {tag}
+                  <span class={count > 2 ? 'text-base' : 'text-xs'}>{count}</span>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>{t.noTags}</p>
+        )
+      }
+    </div>
+  </main>
+</PageLayout>
