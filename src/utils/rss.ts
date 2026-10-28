@@ -34,7 +34,6 @@ export async function createFeed(locale: Locale, site: URL) {
     title: config.title,
     description: useTranslations(locale).description,
     site,
-    stylesheet: '/scripts/pretty-feed-v3.xsl',
     customData: `<language>${locale}</language>`,
     items
   })

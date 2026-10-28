@@ -7,6 +7,5 @@ export const legacyRedirects: Record<string, string> = {
     '/blog/adaptive-sampling-distributed-tracing/',
   '/vn/2026/09/12/ba-tro-choi-nho.html': '/vi/blog/three-small-games/',
   '/2026/10/11/captain-tsubasa-ii-password-generator.html':
-    '/blog/captain-tsubasa-ii-password-generator/',
-  '/vn/2026/10/27/pentomino-sudoku-tao-de-in-a4.html': '/vi/blog/pentomino-sudoku-a4-puzzles/'
+    '/blog/captain-tsubasa-ii-password-generator/'
 }
