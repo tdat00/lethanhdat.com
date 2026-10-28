@@ -1,0 +1,128 @@
+---
+import type { Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import type { Project, ProjectLinkType } from '@/data/projects'
+
+interface Props {
+  projects: Project[]
+  locale: Locale
+}
+
+const { projects, locale } = Astro.props
+const t = useTranslations(locale)
+
+const labels: Record<ProjectLinkType, string> = {
+  github: t.projectGithub,
+  site: t.projectSite,
+  doc: t.projectDoc
+}
+
+type ProjectLink = Project['links'][number]
+const hrefOf = ({ href }: ProjectLink) => (typeof href === 'string' ? href : href[locale])
+// Websites without their own favicon (the toys) show no icon.
+const faviconOf = ({ type, favicon }: ProjectLink) =>
+  favicon ?? (type === 'github' ? '/images/favicons/github.svg' : undefined)
+const faviconClass = ({ type }: ProjectLink) =>
+  type === 'github' ? 'm-0 size-5 object-contain github-favicon' : 'm-0 size-5 object-contain'
+// The title points to the demo site when there is one, otherwise to the first link.
+const mainLinkOf = ({ links }: Project) => links.find(({ type }) => type === 'site') ?? links[0]
+const imageOf = ({ image }: Project) => (typeof image === 'string' ? image : image?.[locale])
+const mask = 'linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%)'
+---
+
+<div class='grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 sm:gap-y-4'>
+  {
+    projects.map((project) => {
+      const image = imageOf(project)
+      const main = mainLinkOf(project)
+      // Websites are reached through the title, so only the GitHub link gets an icon.
+      const iconLinks = project.links.filter(({ type }) => type === 'github')
+      return (
+        <div
+          class='project-card relative isolate cursor-pointer overflow-hidden rounded-xl border'
+          data-href={hrefOf(main)}
+        >
+          {image && (
+            <img
+              class='absolute end-0 -z-10 m-0 h-full w-1/2 object-cover opacity-40'
+              src={image}
+              alt=''
+              loading='lazy'
+              decoding='async'
+              style={`-webkit-mask-image:${mask};mask-image:${mask}`}
+            />
+          )}
+          <div
+            class={`flex flex-col gap-y-1 px-3 py-2 sm:px-4 sm:py-3 ${image ? 'me-20' : ''}`}
+          >
+            <a
+              class='project-link flex items-center gap-x-2 font-medium text-foreground no-underline transition-colors'
+              href={hrefOf(main)}
+              target='_blank'
+              rel='noopener'
+            >
+              {faviconOf(main) && (
+                <img
+                  class={faviconClass(main)}
+                  src={faviconOf(main)}
+                  alt=''
+                  width='20'
+                  height='20'
+                  loading='lazy'
+                />
+              )}
+              <span class='line-clamp-1'>{project.name}</span>
+            </a>
+            <p class='line-clamp-3 leading-snug text-muted-foreground sm:h-[4.125rem]'>
+              {project.description[locale]}
+            </p>
+            {iconLinks.length > 0 && (
+              <div class='flex flex-row items-center gap-x-2 sm:gap-x-3'>
+                {iconLinks.map((link) => (
+                  <a
+                    href={hrefOf(link)}
+                    class='relative z-10 rounded-full bg-muted p-1.5 transition-opacity hover:opacity-70 sm:p-2'
+                    title={labels[link.type]}
+                    aria-label={`${project.name} - ${labels[link.type]}`}
+                    target='_blank'
+                    rel='noopener'
+                  >
+                    <img
+                      class={faviconClass(link)}
+                      src={faviconOf(link)}
+                      alt=''
+                      width='20'
+                      height='20'
+                      loading='lazy'
+                    />
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    })
+  }
+</div>
+
+<script>
+  // The whole card opens the demo; real links inside it (title, GitHub) keep their own behavior,
+  // and selecting text does not trigger navigation.
+  document.querySelectorAll<HTMLElement>('.project-card[data-href]').forEach((card) => {
+    card.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('a')) return
+      if (window.getSelection()?.toString()) return
+      window.open(card.dataset.href, '_blank', 'noopener')
+    })
+  })
+</script>
+
+<style>
+  .project-card:hover .project-link {
+    color: hsl(var(--primary));
+  }
+  :global(.dark) .github-favicon {
+    filter: invert(1);
+  }
+</style>

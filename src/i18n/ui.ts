@@ -5,6 +5,7 @@ const en = {
   tagline: 'a boy who code',
 
   menuBlog: 'Blog',
+  menuProjects: 'Projects',
   menuTags: 'Tags',
   menuArchives: 'Archives',
   menuToggle: 'Menu',
@@ -44,6 +45,12 @@ const en = {
   archivesDescription: 'A list of all my posts, grouped by year',
   postCount: (count: number) => `${count} post${count === 1 ? '' : 's'}`,
 
+  projects: 'Projects',
+  projectsDescription: 'Some of the projects I have built, and a few funny toys to play with',
+  projectGithub: 'GitHub',
+  projectSite: 'Website',
+  projectDoc: 'Documentation',
+
   searchTitle: 'Search',
   searchDescription: 'Search the posts of the whole blog',
   searchPrompt: 'Enter a search term or phrase to search the blog.',
@@ -68,6 +75,7 @@ const vi: typeof en = {
   tagline: 'chàng trai viết code',
 
   menuBlog: 'Bài viết',
+  menuProjects: 'Dự án',
   menuTags: 'Thẻ',
   menuArchives: 'Lưu trữ',
   menuToggle: 'Menu',
@@ -106,6 +114,12 @@ const vi: typeof en = {
   archives: 'Lưu trữ',
   archivesDescription: 'Danh sách tất cả bài viết, nhóm theo năm',
   postCount: (count) => `${count} bài viết`,
+
+  projects: 'Dự án',
+  projectsDescription: 'Một số dự án tôi đã làm và vài món đồ chơi vui để thử',
+  projectGithub: 'GitHub',
+  projectSite: 'Trang web',
+  projectDoc: 'Tài liệu',
 
   searchTitle: 'Tìm kiếm',
   searchDescription: 'Tìm kiếm trong tất cả bài viết của blog',

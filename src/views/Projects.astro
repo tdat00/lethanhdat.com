@@ -1,0 +1,40 @@
+---
+import { Button } from 'astro-pure/user'
+
+import { localizedPath, type Locale } from '@/i18n/config'
+import { useTranslations } from '@/i18n/ui'
+import ProjectSection from '@/components/ProjectSection.astro'
+import PageLayout from '@/layouts/BaseLayout.astro'
+import { projectGroups } from '@/data/projects'
+
+interface Props {
+  locale: Locale
+}
+
+const { locale } = Astro.props
+const t = useTranslations(locale)
+---
+
+<PageLayout {locale} meta={{ title: t.projects, description: t.projectsDescription }}>
+  <Button title={t.backToHome} href={localizedPath(locale, '/')} variant='back' />
+
+  <main class='mt-6 lg:mt-10'>
+    <div id='content-header' class='animate'>
+      <h1 class='mb-3 text-3xl font-medium'>{t.projects}</h1>
+      <p class='mb-8 text-muted-foreground'>{t.projectsDescription}</p>
+    </div>
+
+    <div id='content' class='animate flex flex-col gap-y-10'>
+      {
+        projectGroups.map((group) => (
+          <section aria-labelledby={group.id}>
+            <h2 id={group.id} class='mb-4 text-xl font-medium'>
+              {group.title[locale]}
+            </h2>
+            <ProjectSection projects={group.projects} {locale} />
+          </section>
+        ))
+      }
+    </div>
+  </main>
+</PageLayout>
